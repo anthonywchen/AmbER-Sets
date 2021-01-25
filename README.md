@@ -6,6 +6,7 @@ AmbER sets are stored in a JSONLines format under the following path:
 
 Here is an example AmbER set for the name "Abe Lincoln" from the human collection (AmbER-H) for the question answering task:
 
+`amber_sets/human/qa/amber_sets.jsonl`
 ```
 {
     "name": "Abe Lincoln",
