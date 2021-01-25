@@ -32,8 +32,6 @@ Here is an example AmbER set for the name "Abe Lincoln" from the human collectio
                     "output": [
                         {
                             "answer": [
-                                "War of the Rebellion",
-                                "American Civil War",
                                 "American Civil War"
                                 ...
                             ],
@@ -69,9 +67,7 @@ Here is an example AmbER set for the name "Abe Lincoln" from the human collectio
                         {
                             "answer": [
                                 "slide trombone",
-                                "tenor trombone",
-                                "valve trombone",
-                                "trombone"
+                                ...
                             ],
                             "provenance": [
                                 {
