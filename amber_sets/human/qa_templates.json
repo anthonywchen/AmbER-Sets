@@ -1,0 +1,132 @@
+{
+    "P1303": {
+        "all": [
+            "Which musical instrument did $entity play?",
+            "What musical instrument does $entity play?",
+            "What instrument does $entity play?"
+        ]
+    },
+    "P241": {
+        "all": [
+            "What branch of the military does $entity belong to?",
+            "Which military branch does $entity belong to?",
+            "What military branch is $entity affiliated with?"
+        ]
+    },
+    "P641": {
+        "all": [
+            "Which sport does $entity participate in?",
+            "Which sport does $entity play?",
+            "What sport does $entity play?"
+        ]
+    },
+    "P157": {
+        "all": [
+            "Who was $entity killed by?",
+            "Who killed $entity?",
+            "Who murdered $entity?"
+        ]
+    },
+    "P607": {
+        "all": [
+            "What were the wars that $entity participated in?",
+            "Which battle did $entity fight in?",
+            "Which war did $entity fight?"
+        ]
+    },
+    "P185": {
+        "all": [
+            "Who were the doctoral students of $entity?",
+            "Who are $entity's doctoral students?",
+            "Who did $entity advise?"
+        ]
+    },
+    "P1441": {
+        "all": [
+            "What works does the fictional entity $entity appear in?",
+            "What work is the character $entity present in?",
+            "Which work was the character $entity in?"
+        ],
+        "Q1344": [
+            "What opera does the fictional entity $entity appear in?",
+            "What opera is the character $entity present in?",
+            "Which opera was the character $entity in?"
+        ],
+        "Q7725634": [
+            "What literary work does the fictional entity $entity appear in?",
+            "What literary work is the character $entity present in?",
+            "Which literary work was the character $entity in?"
+        ],
+        "Q5398426": [
+            "What TV show does the fictional entity $entity appear in?",
+            "What TV show is the character $entity present in?",
+            "Which TV show was the character $entity in?"
+        ],
+        "Q24856": [
+            "What films does the fictional entity $entity appear in?",
+            "What film is the character $entity present in?",
+            "Which film was the character $entity in?"
+        ]
+    },
+    "P54": {
+        "all": [
+            "$entity plays for which team?",
+            "What team does $entity play for?",
+            "Which team does $entity play for?"
+        ],
+        "Q476028": [
+            "$entity plays for which football team?",
+            "What football team does $entity play for?",
+            "Which football team does $entity play for?"
+        ],
+        "Q4498974": [
+            "$entity plays for which ice hockey ice hockey team?",
+            "What ice hockey team does $entity play for?",
+            "Which ice hockey team does $entity play for?"
+        ],
+        "Q13393265": [
+            "$entity plays for which basketball team?",
+            "What basketball team does $entity play for?",
+            "Which basketball team does $entity play for?"
+        ],
+        "Q13027888": [
+            "$entity plays for which baseball team?",
+            "What baseball team does $entity play for?",
+            "Which baseball team does $entity play for?"
+        ],
+        "Q17156793": [
+            "$entity plays for which football  team?",
+            "What football team does $entity play for?",
+            "Which football team does $entity play for?"
+        ]
+    },
+    "P135": {
+        "all": [
+            "What movement did $entity participate in?",
+            "Which movement is $entity associated with?",
+            "What movement is $entity associated with?"
+        ],
+        "Q968159": [
+            "What art movement did $entity participate in?",
+            "Which art movement is $entity associated with?",
+            "What art movement is $entity associated with?"
+        ],
+        "Q3326717": [
+            "What literary movement did $entity participate in?",
+            "Which literary movement is $entity associated with?",
+            "What literary movement is $entity associated with?"
+        ],
+        "Q2198855": [
+            "What cultural movement did $entity participate in?",
+            "Which cultural movement is $entity associated with?",
+            "What cultural movement is $entity associated with?"
+        ]
+    },
+    "P413": {
+        "all": [
+            "What is the position that $entity plays?",
+            "What position does $entity play?",
+            "Which position does $entity play?"
+        ]
+    }
+}

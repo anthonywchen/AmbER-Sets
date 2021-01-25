@@ -1,0 +1,49 @@
+{
+    "P1303": [
+        "$entity plays the $object.",
+        "$entity plays the musical instrument $object.",
+        "The $object is played by $entity."
+    ],
+    "P135": [
+        "$entity was a member of the $object movement.",
+        "$entity participated in the $object movement.",
+        "$entity was a part of the $object movement."
+    ],
+    "P1441": [
+        "$entity is a character in $object.",
+        "$entity is a fictional character in $object.",
+        "$object features the fictional character $entity."
+    ],
+    "P157": [
+        "$entity was assassinated by $object.",
+        "$entity was killed by $object.",
+        "$entity was murdered by $object."
+    ],
+    "P185": [
+        "$entity has a doctoral student named $object.",
+        "$entity's doctoral student is $object.",
+        "$entity advised their student $object."
+    ],
+    "P241": [
+        "$entity is a member of the $object.",
+        "$entity belongs to the military branch $object.",
+        "$entity belongs to the $object branch of the military."
+    ],
+    "P413": [
+        "$entity plays the $object position.",
+        "$entity plays as a $object."
+    ],
+    "P54": [
+        "$entity is a player on the $object.",
+        "$entity plays for the $object team.",
+        "$entity plays for the $object."
+    ],
+    "P607": [
+        "$entity fought in the $object.",
+        "$entity fought in $object."
+    ],
+    "P641": [
+        "$entity plays $object.",
+        "$entity plays the sport $object."
+    ]
+}

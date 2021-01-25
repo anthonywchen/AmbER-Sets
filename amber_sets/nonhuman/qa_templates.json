@@ -1,0 +1,65 @@
+{
+    "P1082": {
+        "all": [
+            "What is the total population of $entity?",
+            "What is the population of $entity?",
+            "How many people live in $entity?"
+        ]
+    },
+    "P161": {
+        "all": [
+            "Who acted in $entity?",
+            "Who is a cast member on $entity?",
+            "Who starred in $entity?"
+        ]
+    },
+    "P175": {
+        "all": [
+            "Who performs $entity?",
+            "Who is the performer of $entity?",
+            "Who performed $entity?"
+        ]
+    },
+    "P2437": {
+        "all": [
+            "How many seasons are there in $entity?",
+            "How many seasons does $entity have?",
+            "How many seasons were there in $entity?"
+        ]
+    },
+    "P264": {
+        "all": [
+            "What is the record label of $entity.?",
+            "What is the record label for $entity?",
+            "$entity belongs to which record label?"
+        ]
+    },
+    "P452": {
+        "all": [
+            "Which industry is $entity in?",
+            "In what industry is $entity?",
+            "What is $entity's industry?"
+        ]
+    },
+    "P50": {
+        "all": [
+            "Who is the author of $entity?",
+            "Who wrote $entity?",
+            "Who authored $entity?"
+        ]
+    },
+    "P58": {
+        "all": [
+            "Who was the screenwriter for $entity?",
+            "Who was screenwriter for $entity?",
+            "Who is $entity's screenwriter?"
+        ]
+    },
+    "P658": {
+        "all": [
+            "What song appears in the album $entity?",
+            "What song appears on $entity?",
+            "What are the tracks in $entity?"
+        ]
+    }
+}
