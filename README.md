@@ -87,3 +87,8 @@ Here is an example AmbER set for the name "Abe Lincoln" from the human collectio
     }
 }
 ```
+
+# License
+The code in this repository is licensed according to [SOME LICENSE TBD]() file.
+
+The AmbER data is licensed under the [Creative Commons Zero v1.0 Universal License](https://creativecommons.org/publicdomain/zero/1.0/).
