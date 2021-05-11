@@ -1,4 +1,4 @@
-datasets
+datasets==1.4.0
 inflect
 jsonlines
 ujson
