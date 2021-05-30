@@ -33,7 +33,7 @@ def generate_queries(amber_set_tuples, templates):
 
         for qid, qid_dict in d['qids'].items():
             amber_set['qids'][qid] = {
-                'is_topdog': qid_dict['is_topdog'],
+                'is_head': qid_dict['is_head'],
                 'pop': qid_dict['pop'],
                 'wikipedia': qid_dict['wikipedia'],
                 'queries': []

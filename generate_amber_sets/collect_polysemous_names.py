@@ -28,8 +28,6 @@ def add_pid_value_entity_types(qid_to_pids):
                     answer_dict['entity_types'] = [e['qid'] for e in
                                                    qid_to_pids.get(answer_dict['qid'], {}).get('P31', [])]
 
-    return qid_to_pids
-
 
 def add_pid_value_aliases(qid_to_pids, qid_to_aliases_file):
     """ Add entity alises for Wikidata answers
@@ -74,8 +72,6 @@ def add_pid_value_aliases(qid_to_pids, qid_to_aliases_file):
                     except:
                         answer_dict['additional_aliases'] = []
 
-    return qid_to_pids
-
 
 def get_most_popular_pid_values(qid_to_pids, good_pids_file):
     good_pids_data = json.load(open(good_pids_file))
@@ -115,8 +111,6 @@ def add_pid_names(qid_to_pids, pid_to_label_file):
                 'values': qid_to_pids[qid][pid],
             }
 
-    return qid_to_pids
-
 
 def remove_qids(qid_to_pids, good_pids_file):
     """ Remove QID if WikiData type doesn't match list of accepted types """
@@ -133,19 +127,17 @@ def remove_qids(qid_to_pids, good_pids_file):
         if len(qid_types.intersection(good_qid_types)) == 0:
             del qid_to_pids[qid]
 
-    return qid_to_pids
-
 
 def load_qid_to_pids(qid_to_pids_file, qid_to_aliases_file,
                      pid_to_label_file, good_pids_file):
     print('Loading QID to PID mappings...')
     qid_to_pids = json.load(open(qid_to_pids_file, encoding='utf-8'))
 
-    qid_to_pids = add_pid_value_entity_types(qid_to_pids)
-    qid_to_pids = add_pid_value_aliases(qid_to_pids, qid_to_aliases_file)
+    add_pid_value_entity_types(qid_to_pids)
+    add_pid_value_aliases(qid_to_pids, qid_to_aliases_file)
     get_most_popular_pid_values(qid_to_pids, good_pids_file)
-    qid_to_pids = add_pid_names(qid_to_pids, pid_to_label_file)
-    qid_to_pids = remove_qids(qid_to_pids, good_pids_file)
+    add_pid_names(qid_to_pids, pid_to_label_file)
+    remove_qids(qid_to_pids, good_pids_file)
 
     return qid_to_pids
 
@@ -160,7 +152,7 @@ def merge_aliases_and_pids(alias_to_qids_file, qid_to_pids):
                 e['qid']: {
                     'pids': qid_to_pids[e['qid']],
                     'pop': e['pop'],
-                    'is_topdog': e['is_topdog'],
+                    'is_head': e['is_head'],
                     'entity_types': [e['qid'] for e in
                                      qid_to_pids[e['qid']]['P31']['values']]
                 } for e in qids if e['qid'] in qid_to_pids
@@ -169,7 +161,7 @@ def merge_aliases_and_pids(alias_to_qids_file, qid_to_pids):
 
         # Append alias dictionary if this alias has more than 1 QID
         if len(alias_dict['qids']) > 1:
-            # And if the gap in popularity between topdog and underdog is > 10%
+            # And if the gap in popularity between head and tail is > 10%
             pops = [alias_dict['qids'][qid]['pop'] for qid in alias_dict['qids']]
             pops = sorted(pops, reverse=True)
             percent_diff = 100 * (pops[0] - pops[1]) / (0.5 * pops[0] + 0.5 * pops[1])

@@ -1,12 +1,12 @@
 # AmbER Sets
 
-AmbER sets are stored in a JSONLines format under the following path: 
+AmbER sets are stored in a JSONLines format under the following path: `amber_sets/<collection>/<task>/amber_sets.jsonl`
 
-`amber_sets/<collection>/<task>/amber_sets.jsonl`
+Here is an example AmbER set for "Abe Lincoln" from the human collection (AmbER-H) for the question answering task: `amber_sets/human/qa/amber_sets.jsonl`
 
-Here is an example AmbER set for the name "Abe Lincoln" from the human collection (AmbER-H) for the question answering task:
+<details>
+<summary>Click to expand</summary>
 
-`amber_sets/human/qa/amber_sets.jsonl`
 ```
 {
     "name": "Abe Lincoln",
@@ -62,16 +62,19 @@ Here is an example AmbER set for the name "Abe Lincoln" from the human collectio
 }
 ```
 
+</details>
+
 ## Generating AmbER Sets
 Generating AmbER sets happens in three steps:
 
 1. Downloading and processing a large Wikidata dump
 2. Extracting AmbER set tuples from this dump
-3. Generating task-specific instances (e.g. QA, fact checking) from this AmbER set tuples
+3. Generating task-specific instances (e.g. QA, fact checking) from the AmbER set tuples
 
 ##### Processing Wikidata Dump
 
 ```
+cd process_wikipedia_dump
 ./process_wikidata_dump.sh
 python build_qid_popularity_dictionary.py
 python map_aliases_to_qids.py

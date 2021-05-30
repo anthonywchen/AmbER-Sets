@@ -107,21 +107,21 @@ def filter_unanswerables(amber_tuples):
 
 def filter_aliases(alias_dicts):
     """ Keep aliases that have at least 2 QIDs with PIDS
-        AND the topdog QID has PIDs too
+        AND the head QID has PIDs too
     """
     filtered_alias_dicts = []
 
     for d in alias_dicts:
         good_qid_count = 0
-        topdog_is_good = False
+        head_is_good = False
 
         for qid_dict in d['qids'].values():
             if len(qid_dict['pids']) > 0:
                 good_qid_count += 1
-                if qid_dict['is_topdog']:
-                    topdog_is_good = True
+                if qid_dict['is_head']:
+                    head_is_good = True
 
-        if good_qid_count >= 2 and topdog_is_good:
+        if good_qid_count >= 2 and head_is_good:
             filtered_alias_dicts.append(d)
 
     return filtered_alias_dicts
