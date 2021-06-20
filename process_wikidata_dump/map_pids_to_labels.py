@@ -1,6 +1,7 @@
+from collections import defaultdict
+
 import ujson as json
 import tqdm
-from collections import defaultdict
 
 
 def main():

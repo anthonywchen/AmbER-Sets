@@ -1,7 +1,8 @@
-import ujson as json
 import math
-import tqdm
 from collections import defaultdict
+
+import ujson as json
+import tqdm
 
 
 def main():

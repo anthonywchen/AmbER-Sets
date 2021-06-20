@@ -1,6 +1,8 @@
 #!/bin/bash
 
-axel -n 20 -a https://archive.org/download/wikibase-wikidatawiki-20201026/wikidata-20201026-all.json.bz2
+wget https://archive.org/download/wikibase-wikidatawiki-20201026/wikidata-20201026-all.json.bz2
+# Uncomment below and comment above for faster downloading
+#axel -n 10 -a https://archive.org/download/wikibase-wikidatawiki-20201026/wikidata-20201026-all.json.bz2
 
 # Run background processes to extract out information from Wikidata dump without decompressing the bz2 file.
 process_wikidata_command="bzcat wikidata-20201026-all.json.bz2 | grep '^{' | sed 's/,$//'"

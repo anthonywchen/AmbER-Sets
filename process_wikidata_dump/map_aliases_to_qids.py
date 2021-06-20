@@ -1,12 +1,14 @@
+from collections import defaultdict
+
 import ujson as json
 import tqdm
-from collections import defaultdict
 
 
 def main():
     pop_dict = json.load(open("processed_files/qid_popularities.json"))
-    alias_dict = defaultdict(list)
 
+    # Map each alias to all QIDs
+    alias_dict = defaultdict(list)
     with open("cands.tsv", encoding="utf-8") as cands_file:
         for line in tqdm.tqdm(cands_file):
             (locale, alias, qid) = line.strip().split("\t")
