@@ -61,49 +61,20 @@ Here is an example AmbER set for "Abe Lincoln" from the human collection (AmbER-
     }
 }
 ```
-
 </details>
 
 ## Generating AmbER Sets
+Here are details if you are interested in reproducing the AmbER sets from scratch.
 Generating AmbER sets happens in three steps:
 
 1. Downloading and processing a large Wikidata dump
 2. Extracting AmbER set tuples from this dump
 3. Generating task-specific instances (e.g. QA, fact checking) from the AmbER set tuples
 
-##### Processing Wikidata Dump
+Follow the instructions in `process_wikidata_dump/` followed by `generate_amber_sets/`.
 
-```
-cd process_wikipedia_dump
-./process_wikidata_dump.sh
-python build_qid_popularity_dictionary.py
-python map_aliases_to_qids.py
-python map_pids_to_labels.py
-python map_qids_to_aliases.py
-python map_qids_to_pids.py
-```
-
-##### Extracting AmbER set tuples
-```
-python generate_amber_sets/collect_polysemous_names.py -c <collection>
-python filter_uninformative_pids.py -c <collection>
-python filter_multi_entity_pids -c <collection>
-python align_amber_tuples_to_wikipedia.py -c <collection>
-```
-
-##### Instantiating task specific instances
-
-```
-python generate_<task>_amber_sets.py -c <collection>
-```
-
-e.g. to generate question answering AmbER sets for the human collection:
-```
-python generate_qa_amber_sets.py -c human
-```
 
 ## Evaluating AmbER Set Predictions
-
 
 ## License
 The AmbER data is licensed under the [Creative Commons Zero v1.0 Universal License](https://creativecommons.org/publicdomain/zero/1.0/).
