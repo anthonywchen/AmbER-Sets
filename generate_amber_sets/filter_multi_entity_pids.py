@@ -18,41 +18,41 @@ import jsonlines
 
 def get_unique_pids(alias_dicts):
     for d in alias_dicts:
-        for qid in d['qids']:
+        for qid in d["qids"]:
             # Iterate through PIDs, deleting them if its not unique for alias.
-            for pid in list(d['qids'][qid]['pids'].keys()):
+            for pid in list(d["qids"][qid]["pids"].keys()):
                 pid_is_unique = True
 
-                for other_qid in d['qids']:
+                for other_qid in d["qids"]:
                     if other_qid == qid:
                         continue
 
                     # If the current PID is found in other QID, then delete it
-                    if pid in d['qids'][other_qid]['pids']:
-                        del d['qids'][other_qid]['pids'][pid]
+                    if pid in d["qids"][other_qid]["pids"]:
+                        del d["qids"][other_qid]["pids"][pid]
                         pid_is_unique = False
 
                 # If the current PID isn't unique, then delete it from QID
                 if not pid_is_unique:
-                    del d['qids'][qid]['pids'][pid]
+                    del d["qids"][qid]["pids"][pid]
 
     return alias_dicts
 
 
 def filter_aliases(alias_dicts):
-    """ Keep aliases that have at least 2 QIDs with PIDS AND the HEAD QID
-    has PIDs """
+    """Keep aliases that have at least 2 QIDs with PIDS AND the HEAD QID
+    has PIDs"""
     filtered_alias_dicts = []
 
     for d in alias_dicts:
         good_qid_count = 0
         head_is_good = False
 
-        for qid_dict in d['qids'].values():
-            if len(qid_dict['pids']) > 0:
+        for qid_dict in d["qids"].values():
+            if len(qid_dict["pids"]) > 0:
                 good_qid_count += 1
 
-                if qid_dict['is_head']:
+                if qid_dict["is_head"]:
                     head_is_good = True
 
         if good_qid_count >= 2 and head_is_good:
@@ -62,13 +62,13 @@ def filter_aliases(alias_dicts):
 
 
 def add_amber_ids(alias_dicts):
-    """ For each (alias, QID, PID), we add a unique AmbER ID """
+    """For each (alias, QID, PID), we add a unique AmbER ID"""
     for d in alias_dicts:
-        name = d['name']
-        for qid in d['qids']:
-            for pid in d['qids'][qid]['pids']:
+        name = d["name"]
+        for qid in d["qids"]:
+            for pid in d["qids"][qid]["pids"]:
                 hash_input = repr([name, qid, pid]).encode()
-                d['qids'][qid]['pids'][pid]['amber_id'] = md5(hash_input).hexdigest()
+                d["qids"][qid]["pids"][pid]["amber_id"] = md5(hash_input).hexdigest()
 
     return alias_dicts
 
@@ -78,7 +78,9 @@ def main():
     parser.add_argument("-c", "--collection")
     args = parser.parse_args()
 
-    input_data_file = join("amber_sets", args.collection, "tmp/filtered_uninformative_pids.jsonl")
+    input_data_file = join(
+        "amber_sets", args.collection, "tmp/filtered_uninformative_pids.jsonl"
+    )
     output_data_file = join("amber_sets", args.collection, "tmp/amber_set_tuples.jsonl")
 
     alias_dicts = [line for line in jsonlines.open(input_data_file)]
@@ -87,11 +89,11 @@ def main():
     alias_dicts = add_amber_ids(alias_dicts)
 
     # Sort list of alias dictionaries by the alias
-    alias_dicts = sorted(alias_dicts, key=lambda k: k['name'])
+    alias_dicts = sorted(alias_dicts, key=lambda k: k["name"])
 
-    with open(output_data_file, 'w', encoding='utf-8') as f:
+    with open(output_data_file, "w", encoding="utf-8") as f:
         for d in alias_dicts:
-            f.write(json.dumps(d, ensure_ascii=False) + '\n')
+            f.write(json.dumps(d, ensure_ascii=False) + "\n")
 
 
 if __name__ == "__main__":

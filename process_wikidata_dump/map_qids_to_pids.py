@@ -7,32 +7,29 @@ from collections import defaultdict
 def construct_answer_dictionary(value_dict):
     if value_dict is None:
         return None
-    type = value_dict['type']
+    type = value_dict["type"]
 
-    if type == 'wikibase-entityid':
+    if type == "wikibase-entityid":
+        answer_dict = {"type": "entityid", "qid": value_dict["value"]["id"]}
+    elif type == "quantity":
         answer_dict = {
-            'type': 'entityid',
-            'qid': value_dict['value']['id']
+            "type": type,
+            "amount": value_dict["value"]["amount"],
+            "unit": value_dict["value"]["unit"],
         }
-    elif type == 'quantity':
-        answer_dict = {
-            'type': type,
-            'amount': value_dict['value']['amount'],
-            'unit': value_dict['value']['unit']
-        }
-    else: # Skip answers that are strings, GPS location, etc.
+    else:  # Skip answers that are strings, GPS location, etc.
         answer_dict = None
 
     return answer_dict
 
 
 def map_qids_to_pids():
-    pop_dict = json.load(open('processed_files/qid_popularities.json'))
+    pop_dict = json.load(open("processed_files/qid_popularities.json"))
     qids_to_pids = defaultdict(lambda: defaultdict(list))
 
-    with open('pids.tsv', encoding='utf-8') as f:
+    with open("pids.tsv", encoding="utf-8") as f:
         for line in tqdm.tqdm(f):
-            qid, pid, value_dict = line.split('\t')
+            qid, pid, value_dict = line.split("\t")
             if qid not in pop_dict:
                 continue
 
@@ -49,8 +46,8 @@ def map_qids_to_pids():
 
 
 def filter_useless_qids(qids_to_pids):
-    """ Removes QIDs that only have one PID """
-    print('Removing useless QIDs...')
+    """Removes QIDs that only have one PID"""
+    print("Removing useless QIDs...")
     for qid in tqdm.tqdm(list(qids_to_pids.keys())):
         pids = list(qids_to_pids[qid].keys())
         if len(pids) == 1:
@@ -63,9 +60,9 @@ def main():
     qids_to_pids = map_qids_to_pids()
     qids_to_pids = filter_useless_qids(qids_to_pids)
 
-    with open('processed_files/qid_to_pids.json', 'w', encoding='utf-8') as f:
+    with open("processed_files/qid_to_pids.json", "w", encoding="utf-8") as f:
         f.write(json.dumps(qids_to_pids, ensure_ascii=False))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
