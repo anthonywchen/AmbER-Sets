@@ -18,6 +18,7 @@ def extract_aliases(entities, qid):
     return aliases
 
 
+def extract
 def add_entity_types_to_values(entities):
     """Add entity types for Wikidata answers
 
@@ -117,7 +118,8 @@ def add_pid_names(entities):
     for qid in tqdm.tqdm(entities):
         if qid[0] == 'P':
             continue
-        for pid in entities[qid].get("relations", []):
+
+        for pid in entities[qid]['relations']:
             entities[qid]["relations"][pid] = {
                 "property": entities[pid]["label"],
                 "values": entities[qid]["relations"][pid],
