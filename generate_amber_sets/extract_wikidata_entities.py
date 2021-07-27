@@ -74,8 +74,8 @@ def extract_aliases(line):
 def extract_entity_types(line):
     """Extracts the entity type for an entity"""
     entity_types = []
-    # P31 is "instance of" and P279 is "subclass of". We define these to represent entity types.
-    for entry in line['claims'].get('P31', []) + line['claims'].get('P279', []):
+    # P31 is "instance of". We define these to represent entity types.
+    for entry in line['claims'].get('P31', []):
         if entry['mainsnak']['datatype'] == 'wikibase-item' and \
                 'datavalue' in entry['mainsnak']:
             entity_types.append(entry['mainsnak']['datavalue']['value']['id'])
@@ -93,7 +93,7 @@ def extract_relations(line):
     """Extracts all relations for each entity line where the value of the relation
     is either an entity or a quantity.
     """
-    relations = collections.defaultdict(list)
+    relations = collections.defaultdict(lambda: collections.defaultdict(list))
 
     for relation_id in line['claims']:
         # Each relation may have multiple values. Iterate through those values.
@@ -103,13 +103,13 @@ def extract_relations(line):
 
                 # Check that the current answer is an entity
                 if answer_type == 'wikibase-item':
-                    relations[relation_id].append({
+                    relations[relation_id]['values'].append({
                         "type": answer_type,
                         "qid": entry['mainsnak']['datavalue']['value']['id']
                     })
                 # Check that the current answer is an quantity
                 elif answer_type == "quantity":
-                    relations[relation_id].append({
+                    relations[relation_id]['values'].append({
                         "type": answer_type,
                         "amount": entry['mainsnak']["datavalue"]["value"]["amount"],
                         "unit": entry['mainsnak']["datavalue"]["value"]["unit"]
@@ -151,10 +151,9 @@ def main():
     # Iterate through the Wikidata dump without decompressing it
     writer = open(args.output_file, "w", encoding="utf-8")
     writer.write("{\n")
+    first_line_written = False
 
     with bz2.open(args.wikidata_dump, "rt") as reader:
-        first_line_written = False
-
         # Each line corresponds to a dictionary about a Wikidata entity
         for line in tqdm.tqdm(reader, desc="Processing Wikidata"):
             if dumb_filter(line) or line.strip() in ["[", "]"]:
@@ -166,21 +165,18 @@ def main():
             # Current line is an entity
             if line["type"] == "item":
                 label = extract_label(line)
-                entity_types = extract_entity_types(line)
-                relations = extract_relations(line)
                 wikipedia_page = extract_wikipedia_page(line)
                 popularity = wiki_popularity.get(wikipedia_page)
 
-                # Skip if entity doesn't have name, types, or page views
-                if label is None or popularity is None or \
-                        relations == {} or entity_types == []:
+                # Skip if entity doesn't have name or English Wikipedia page views
+                if label is None or popularity is None:
                     continue
 
                 info_dict = {
                     "label": label,
                     "aliases": extract_aliases(line),
-                    "entity_types": entity_types,
-                    "relations": relations,
+                    "entity_types": extract_entity_types(line),
+                    "pids": extract_relations(line),
                     "popularity": popularity
                 }
             # Current line is a property
@@ -190,9 +186,9 @@ def main():
                 continue
 
             # Write extracted dictionary into a JSON format, one line at a time
-            if first_line_written is False:
+            if first_line_written is True:
                 writer.write(",\n")
-                first_line_written = True
+            first_line_written = True
 
             writer.write(f"{json.dumps(line['id'])}: "
                          f"{json.dumps(info_dict, ensure_ascii=False)}")
