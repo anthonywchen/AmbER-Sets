@@ -47,13 +47,11 @@ def extract_entity_types(entities, qid):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "-e",
-        "--entity_file",
+        "-e", "--entity_file",
         help=".JSON file containing entities, entity information, and relations"
     )
     parser.add_argument(
-        "-c",
-        "--collection",
+        "-c", "--collection",
         help="Collection to collect polysemous names for, AmbER-H (human) or "
              "AmbER-N (nonhuman)",
         choices=["human", "nonhuman"]
@@ -64,13 +62,19 @@ def main():
 
     # Loads entities, then completes the dictionary
     entities = json.load(open(args.entity_file))
+    # Map polysemous names to entities
+    polysemous_names = collections.defaultdict(dict)
     for qid in tqdm.tqdm(entities, desc="Completing entity dictionary"):
         # Skip PIDs since we store QIDs and PIDs together in the entities file
         if qid[0] == 'P':
             continue
 
+        # Map all names to the current entity and store popularity
+        for name in [entities[qid]['label']] + entities[qid]['aliases']:
+            polysemous_names[name][qid] = {'popularity': entities[qid]['popularity']}
+
         # Iterate through all relations for the current entity
-        for pid in entities[qid]['pids']:
+        for pid in list(entities[qid]['pids'].keys()):
             # Add the name of the property into the relations
             entities[qid]['pids'][pid]['property'] = entities[pid]['label']
 
@@ -78,16 +82,30 @@ def main():
             for value in entities[qid]['pids'][pid]['values']:
                 # If the current value is a Wikidata entity
                 if value['type'] == "wikibase-item":
-                    # Add aliases of entity value
                     value['aliases'] = extract_aliases_for_entity(entities, value['qid'])
-
-                    # Add entity types of the entity value
                     value['entity_types'] = extract_entity_types(entities, value['qid'])
-
                 # If the current value is some numerical quantity
                 elif value['type'] == 'quantity':
-                    # Add aliases of quantity
                     value['aliases'] = extract_aliases_for_quantity(entities, value['amount'])
+
+            # Remove values that don't have an alias
+            # entities[qid]['pids'][pid]['values'] = [value for value in entities[qid]['pids'][pid]['values']
+            #                                         if value['aliases']]
+            #
+            # Remove the relation if all values were removed
+            # if not entities[qid]['pids'][pid]['values']:
+            #     del entities[qid]['pids'][pid]
+
+    # For each polysemous name, compute the head and tail entities
+    for name in polysemous_names:
+        # Get all popularity of all entities which share the name
+        pops = [polysemous_names[name][qid]["popularity"] for qid in
+                polysemous_names[name]]
+
+        # An entity is the head if it is the most popular
+        for qid in polysemous_names[name]:
+            pop = polysemous_names[name][qid]['popularity']
+            polysemous_names[name][qid]['is_head'] = pop == max(pops)
 
     # Delete entities where they have an entity type that doesn't match our collection
     good_pids = json.load(open(good_pids_file))
@@ -96,36 +114,26 @@ def main():
         if len(entity_types.intersection(good_pids)) == 0:
             del entities[qid]
 
-    # Construct dictionary mapping names to associated entities
-    polysemous_names = collections.defaultdict(dict)
-    for qid in tqdm.tqdm(entities, desc="Collecting polysemous names"):
-        for name in [entities[qid]['label']] + entities[qid]['aliases']:
-            polysemous_names[name][qid] = entities[qid]
-
-    # Compute head and tail entities, and filter entities with less than 2 entities
+    # Filter names with < 2 entities with relations or with no head entity with relations
     polysemous_names_list = []
-    for name in polysemous_names:
-        # Filter names that don't have at least two entities that share that name
-        if len(polysemous_names[name]) < 2:
-            continue
-
-        pops = [polysemous_names[name][qid]["popularity"] for qid in
-                polysemous_names[name]]
-        pops = sorted(pops, reverse=True)
-        head_entity_pop = pops[0]
-        percent_diff = 100 * (pops[0] - pops[1]) / (0.5 * pops[0] + 0.5 * pops[1])
-
-        # Filter if the gap in popularity between head and tail is < 10%
-        if percent_diff < 10:
-            continue
-
-        for qid in polysemous_names[name]:
-            if polysemous_names[name][qid]['popularity'] == head_entity_pop:
-                polysemous_names[name][qid]['is_head'] = True
+    for name in tqdm.tqdm(polysemous_names):
+        # Update the QIDs with the entire dictionary if the entity wasn't deleted
+        for qid in list(polysemous_names[name].keys()):
+            if qid not in entities:
+                del polysemous_names[name][qid]
             else:
-                polysemous_names[name][qid]['is_head'] = False
+                polysemous_names[name][qid].update(entities[qid])
 
-        polysemous_names_list.append({'name': name, "qids": polysemous_names[name]})
+        # Keep names that have at least two entities that share that name
+        if len(polysemous_names[name]) >= 2:
+            pops = [polysemous_names[name][qid]["popularity"] for qid in
+                    polysemous_names[name]]
+            pops = sorted(pops, reverse=True)
+            percent_diff = 100 * (pops[0] - pops[1]) / (0.5 * pops[0] + 0.5 * pops[1])
+
+            # Keep if the gap in popularity between head and tail is >= 10%
+            if percent_diff >= 10:
+                polysemous_names_list.append({'name': name, "qids": polysemous_names[name]})
 
     with open(output_file, "w", encoding="utf-8") as f:
         for name_dict in polysemous_names_list:
