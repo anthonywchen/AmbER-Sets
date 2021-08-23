@@ -42,30 +42,16 @@ def main():
             entity_types = d['qids'][qid]['entity_types']
 
             # Stores the pre-specified relations that are informative for an entity type
-            informative_pids = list(itertools.chain(*[good_pids[et]['inter'] + good_pids[et]['intra']
-                                                      for et in entity_types if et in good_pids]))
+            informative_pids = list(itertools.chain(*[good_pids[et] for et in
+                                                      entity_types if et in good_pids]))
 
             # Remove relations that aren't informative or are shared across entities
             for pid in list(d['qids'][qid]['pids'].keys()):
                 if pid not in informative_pids or pid_counts[pid] > 1:
                     del d['qids'][qid]['pids'][pid]
 
-    # Filter names where multiple entities or head entity doesn't have relations
-    filtered_names = []
-    for d in polysemous_names:
-        entities_with_relations = 0
-        head_has_relations = False
-        for qid in d['qids']:
-            if len(d['qids'][qid]['pids']) > 0:
-                entities_with_relations += 1
-                if d['qids'][qid]['is_head']:
-                    head_has_relations = True
-
-        if entities_with_relations >= 2 and head_has_relations:
-            filtered_names.append(d)
-
     with open(output_data_file, "w", encoding="utf-8") as f:
-        for d in filtered_names:
+        for d in polysemous_names:
             f.write(json.dumps(d, ensure_ascii=False) + "\n")
 
 

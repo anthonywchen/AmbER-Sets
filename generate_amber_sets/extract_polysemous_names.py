@@ -29,7 +29,7 @@ def extract_aliases_for_entity(entities, qid):
     return aliases, list(sorted(additional_aliases))
 
 
-def extract_aliases_for_quantity(entities, amount):
+def extract_aliases_for_quantity(amount):
     """Extracts aliases for a numerical value"""
     assert amount[0] in ["+", "-"]
     aliases = [amount[1:]]
@@ -89,7 +89,7 @@ def main():
                 # If the current value is some numerical quantity
                 elif value['type'] == 'quantity':
                     value['aliases'], value['additional_aliases'] = \
-                        extract_aliases_for_quantity(entities, value['amount'])
+                        extract_aliases_for_quantity(value['amount'])
 
     # For each polysemous name, compute the head and tail entities
     for name in polysemous_names:

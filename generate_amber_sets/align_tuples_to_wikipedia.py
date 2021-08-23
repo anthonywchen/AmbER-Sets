@@ -149,7 +149,7 @@ def main():
             if d['qids'][qid]['wikipedia'] == []:
                 del d['qids'][qid]
 
-    # Filter names with < 2 entities with relations or with no head entity with relations
+    # Filter names with < 2 entities with relations or no head entity with relations
     filtered_names = []
     for d in polysemous_names:
         entities_with_relations = 0
