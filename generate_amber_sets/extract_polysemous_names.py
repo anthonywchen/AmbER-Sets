@@ -12,6 +12,7 @@ engine = inflect.engine()
 def extract_aliases_for_entity(entities, qid):
     """Extracts aliases for a Wikidata entity"""
     aliases = []
+    additional_aliases = set()
     if qid in entities:
         aliases = set(entities[qid]['aliases'])
 
@@ -21,11 +22,11 @@ def extract_aliases_for_entity(entities, qid):
                      entities[qid]['pids'].get("P1535", {}).get("values", []):
             pqid = value["qid"]  # pqid = participant QID
             if pqid in entities:
-                aliases.update([entities[pqid]['label']] + entities[pqid]['aliases'])
+                additional_aliases.update([entities[pqid]['label']] + entities[pqid]['aliases'])
 
         # Ensures label is always first element in aliases
         aliases = [entities[qid]['label']] + sorted(aliases)
-    return aliases
+    return aliases, list(sorted(additional_aliases))
 
 
 def extract_aliases_for_quantity(entities, amount):
@@ -33,10 +34,10 @@ def extract_aliases_for_quantity(entities, amount):
     assert amount[0] in ["+", "-"]
     aliases = [amount[1:]]
     try:
-        aliases.append(engine.number_to_words(amount[1:]))
+        additional_aliases = [engine.number_to_words(amount[1:])]
     except:
-        pass
-    return aliases
+        additional_aliases = []
+    return aliases, additional_aliases
 
 
 def extract_entity_types(entities, qid):
@@ -82,19 +83,13 @@ def main():
             for value in entities[qid]['pids'][pid]['values']:
                 # If the current value is a Wikidata entity
                 if value['type'] == "wikibase-item":
-                    value['aliases'] = extract_aliases_for_entity(entities, value['qid'])
+                    value['aliases'], value['additional_aliases'] = \
+                        extract_aliases_for_entity(entities, value['qid'])
                     value['entity_types'] = extract_entity_types(entities, value['qid'])
                 # If the current value is some numerical quantity
                 elif value['type'] == 'quantity':
-                    value['aliases'] = extract_aliases_for_quantity(entities, value['amount'])
-
-            # Remove values that don't have an alias
-            # entities[qid]['pids'][pid]['values'] = [value for value in entities[qid]['pids'][pid]['values']
-            #                                         if value['aliases']]
-            #
-            # Remove the relation if all values were removed
-            # if not entities[qid]['pids'][pid]['values']:
-            #     del entities[qid]['pids'][pid]
+                    value['aliases'], value['additional_aliases'] = \
+                        extract_aliases_for_quantity(entities, value['amount'])
 
     # For each polysemous name, compute the head and tail entities
     for name in polysemous_names:
@@ -114,7 +109,7 @@ def main():
         if len(entity_types.intersection(good_pids)) == 0:
             del entities[qid]
 
-    # Filter names with < 2 entities with relations or with no head entity with relations
+    # Filter names with < 2 entities
     polysemous_names_list = []
     for name in tqdm.tqdm(polysemous_names):
         # Update the QIDs with the entire dictionary if the entity wasn't deleted
