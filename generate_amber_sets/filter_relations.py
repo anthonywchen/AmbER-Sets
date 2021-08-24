@@ -45,9 +45,11 @@ def main():
             informative_pids = list(itertools.chain(*[good_pids[et] for et in
                                                       entity_types if et in good_pids]))
 
-            # Remove relations that aren't informative or are shared across entities
+            # Remove relations that aren't informative or are shared across entities or
+            # don't have any values
             for pid in list(d['qids'][qid]['pids'].keys()):
-                if pid not in informative_pids or pid_counts[pid] > 1:
+                if pid not in informative_pids or pid_counts[pid] > 1 or \
+                        len(d['qids'][qid]['pids'][pid]['values']) == 0:
                     del d['qids'][qid]['pids'][pid]
 
     with open(output_data_file, "w", encoding="utf-8") as f:

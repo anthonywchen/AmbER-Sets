@@ -11,8 +11,6 @@ from os.path import join
 import jsonlines
 from tqdm import tqdm
 
-random.seed(0)
-
 
 def fill_in_template(template, entity_name):
     """Fill in template with an entity name.
@@ -34,7 +32,7 @@ def generate_queries(amber_set_tuples, templates):
         for qid, qid_dict in d["qids"].items():
             amber_set["qids"][qid] = {
                 "is_head": qid_dict["is_head"],
-                "pop": qid_dict["pop"],
+                "popularity": qid_dict["popularity"],
                 "wikipedia": qid_dict["wikipedia"],
                 "queries": [],
             }
@@ -98,9 +96,8 @@ def main():
     templates_file = join("amber_sets", args.collection, "qa_templates.json")
     output_data_file = join("amber_sets", args.collection, "qa/amber_sets.jsonl")
 
-    amber_set_tuples = [line for line in jsonlines.open(input_data_file)]
+    amber_set_tuples = list(jsonlines.open(input_data_file))
     templates = json.load(open(templates_file))
-
     amber_sets = generate_queries(amber_set_tuples, templates)
 
     with open(output_data_file, "w", encoding="utf-8") as f:

@@ -91,6 +91,12 @@ def main():
                     value['aliases'], value['additional_aliases'] = \
                         extract_aliases_for_quantity(value['amount'])
 
+            # Filter out values without any aliases
+            entities[qid]['pids'][pid]['values'] = [
+                value for value in entities[qid]['pids'][pid]['values']
+                if len(value['aliases']) > 0
+            ]
+
     # For each polysemous name, compute the head and tail entities
     for name in polysemous_names:
         # Get all popularity of all entities which share the name

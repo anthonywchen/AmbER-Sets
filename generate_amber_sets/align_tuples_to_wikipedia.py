@@ -14,7 +14,6 @@ import tqdm
 
 def normalize_answer(s):
     """Lower text and remove punctuation, articles and extra whitespace."""
-
     def remove_articles(text):
         regex = re.compile(r"\b(a|an|the)\b", re.UNICODE)
         return re.sub(regex, " ", text)

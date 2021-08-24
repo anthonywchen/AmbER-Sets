@@ -27,7 +27,7 @@ def generate_slot_filling_dataset(amber_set_tuples):
         for qid, qid_dict in d["qids"].items():
             amber_set["qids"][qid] = {
                 "is_head": qid_dict["is_head"],
-                "pop": qid_dict["pop"],
+                "popularity": qid_dict["popularity"],
                 "wikipedia": qid_dict["wikipedia"],
                 "queries": [],
             }
@@ -74,9 +74,7 @@ def main():
 
     input_data_file = join("amber_sets", args.collection, "amber_set_tuples.jsonl")
     output_data_file = join("amber_sets", args.collection, "sf/amber_sets.jsonl")
-
-    amber_set_tuples = [line for line in jsonlines.open(input_data_file)]
-
+    amber_set_tuples = list(jsonlines.open(input_data_file))
     amber_sets = generate_slot_filling_dataset(amber_set_tuples)
 
     with open(output_data_file, "w", encoding="utf-8") as f:

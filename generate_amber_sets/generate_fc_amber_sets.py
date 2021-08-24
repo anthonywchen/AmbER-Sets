@@ -6,16 +6,13 @@ import argparse
 import hashlib
 import json
 import random
+from collections import defaultdict
 from os.path import join
 
-import datasets
 import jsonlines
 from tqdm import tqdm
 
-from align_amber_tuples_to_wikipedia import answer_in_doc
-
 random.seed(0)
-wikipedia = datasets.load_dataset("kilt_wikipedia")["full"]
 
 
 def fill_template(template, entity, object):
@@ -29,33 +26,35 @@ def fill_template(template, entity, object):
 
 
 def generate_true_instance(template, entity_name, pid_dict):
-    for value in pid_dict["values"]:
-        for answer in value["aliases"]:
-            for wikipedia_dict in pid_dict["provenance"]:
-                kilt_idx = wikipedia_dict["kilt_idx"]
-                doc = " ".join(wikipedia[kilt_idx]["text"]["paragraph"])
-                doc = " ".join(doc.split()[:350])
-
-                # Test if answer is in the current Wikipedia page
-                if answer_in_doc(answer, doc):
-                    answer = value["aliases"][-1]
-                    query, query_hashlib = fill_template(template, entity_name, answer)
-                    return query, query_hashlib
+    answer = pid_dict["values"][0]["aliases"][0]
+    query, query_hashlib = fill_template(template, entity_name, answer)
+    return query, query_hashlib
 
 
 def generate_false_instance(template, entity_name, pid_dict, other_answers):
-    answers = []
-    for value in pid_dict["values"]:
-        if len(value["aliases"]):
-            answers.append(value["aliases"][-1])
-
+    answers = [value['aliases'][0] for value in pid_dict["values"]]
     for wrong_answer in other_answers:
         if wrong_answer not in answers:
             query, query_hashlib = fill_template(template, entity_name, wrong_answer)
             return query, query_hashlib
 
 
-def generate_queries(amber_set_tuples, popular_pid_values, templates):
+def generate_queries(amber_set_tuples, templates):
+    # Get the most popular values for each PID
+    popular_pid_values = defaultdict(lambda: defaultdict(int))
+    for d in tqdm(amber_set_tuples):
+        for qid in d['qids']:
+            for pid in d['qids'][qid]['pids']:
+                for value in d['qids'][qid]['pids'][pid]['values']:
+                    answer = value["aliases"][0]
+                    popular_pid_values[pid][answer] += 1
+
+    # For each PID, keep around the 50 most popular answers
+    for pid in popular_pid_values:
+        popular_pid_values[pid] = sorted(
+            popular_pid_values[pid], key=popular_pid_values[pid].get, reverse=True
+        )[:50]
+
     amber_sets = []
 
     for d in tqdm(amber_set_tuples):
@@ -65,7 +64,7 @@ def generate_queries(amber_set_tuples, popular_pid_values, templates):
         for qid, qid_dict in d["qids"].items():
             amber_set["qids"][qid] = {
                 "is_head": qid_dict["is_head"],
-                "pop": qid_dict["pop"],
+                "popularity": qid_dict["popularity"],
                 "wikipedia": qid_dict["wikipedia"],
                 "queries": [],
             }
@@ -142,17 +141,12 @@ def main():
     args = parser.parse_args()
 
     input_data_file = join("amber_sets", args.collection, "amber_set_tuples.jsonl")
-    popular_pid_values_file = join(
-        "amber_sets", args.collection, "popular_pid_values.json"
-    )
     templates_file = join("amber_sets", args.collection, "fc_templates.json")
     output_data_file = join("amber_sets", args.collection, "fc/amber_sets.jsonl")
 
-    amber_set_tuples = [line for line in jsonlines.open(input_data_file)]
-    popular_pid_values = json.load(open(popular_pid_values_file, encoding="utf-8"))
+    amber_set_tuples = list(jsonlines.open(input_data_file))
     templates = json.load(open(templates_file))
-
-    amber_sets = generate_queries(amber_set_tuples, popular_pid_values, templates)
+    amber_sets = generate_queries(amber_set_tuples, templates)
 
     with open(output_data_file, "w", encoding="utf-8") as f:
         for d in amber_sets:
