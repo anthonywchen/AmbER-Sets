@@ -117,28 +117,25 @@ def main():
                 # current entity that also contain aliases of the current relation
                 d['qids'][qid]['pids'][pid]['provenance'] = []
 
-                # All possible answers to the current tuple
-                pid_answers = list(itertools.chain(*[
-                    value_dict['aliases']
-                    for value_dict in d['qids'][qid]['pids'][pid]['values']
-                ]))
-
                 # Iterate through each Wikipedia article, and check that the value of
                 # the current relation has value aliases in the Wikipedia article. If
-                # so, we treat this as the "gold" document
-                for article in articles:
-                    doc = " ".join(article["text"])
-                    doc = " ".join(doc.split()[:350])
-
-                    # Check if any of the answers is in the document
-                    for answer in pid_answers:
-                        # If so, we treat the current document as a gold document
-                        if answer_in_doc(answer, doc):
-                            d['qids'][qid]['pids'][pid]['provenance'].append({
-                                'wikipedia_id': article['wikipedia_id'],
-                                'title': article['wikipedia_title']
-                            })
-                            break
+                # so, we treat the article as a "gold" document and mark
+                # that this value appeared in a gold document
+                for value in d['qids'][qid]['pids'][pid]["values"]:
+                    found_in_passage = False
+                    for answer in value["aliases"]:
+                        for article in articles:
+                            doc = " ".join(article["text"])
+                            doc = " ".join(doc.split()[:350])
+                            if answer_in_doc(answer, doc):
+                                provenance_dict = {
+                                    'wikipedia_id': article['wikipedia_id'],
+                                    'title': article['wikipedia_title']
+                                }
+                                if provenance_dict not in d['qids'][qid]['pids'][pid]['provenance']:
+                                    d['qids'][qid]['pids'][pid]['provenance'].append(provenance_dict)
+                                found_in_passage = True
+                    value['found_in_passage'] = found_in_passage
 
                 # Delete relation if no article had an answer in the document
                 if len(d['qids'][qid]['pids'][pid]['provenance']) == 0:

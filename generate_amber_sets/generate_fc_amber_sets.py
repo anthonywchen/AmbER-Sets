@@ -26,8 +26,11 @@ def fill_template(template, entity, object):
 
 
 def generate_true_instance(template, entity_name, pid_dict):
-    answer = pid_dict["values"][0]["aliases"][0]
-    query, query_hashlib = fill_template(template, entity_name, answer)
+    for value in pid_dict['values']:
+        if value['found_in_passage']:
+            answer = value["aliases"][0]
+            query, query_hashlib = fill_template(template, entity_name, answer)
+            break
     return query, query_hashlib
 
 
