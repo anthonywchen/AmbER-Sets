@@ -120,16 +120,14 @@ def generate_queries(amber_set_tuples, templates):
                     {
                         "id": pid_dict[pid]["amber_id"] + "=" + false_query_id,
                         "input": false_query,
-                        "output": [
-                            {
-                                "answer": "REFUTES",
-                                "provenance": pid_dict[pid]["provenance"],
-                                "meta": {
-                                    "values": values,
-                                    "additional_values": additional_values,
-                                },
-                            }
-                        ],
+                        "output": {
+                            "answer": "REFUTES",
+                            "provenance": pid_dict[pid]["provenance"],
+                            "meta": {
+                                "values": values,
+                                "additional_values": additional_values,
+                            },
+                        },
                         "meta": {"pid": pid},
                     }
                 )
@@ -140,7 +138,12 @@ def generate_queries(amber_set_tuples, templates):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-c", "--collection")
+    parser.add_argument(
+        "-c", "--collection",
+        help="Collection to collect polysemous names for, AmbER-H (human) or "
+             "AmbER-N (nonhuman)",
+        choices=["human", "nonhuman"]
+    )
     args = parser.parse_args()
 
     input_data_file = join("amber_sets", args.collection, "amber_set_tuples.jsonl")

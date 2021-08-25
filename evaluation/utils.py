@@ -60,7 +60,7 @@ def get_subset_scores(amber_sets, raw_metrics, head_subset: bool):
 
     for amber_set in amber_sets:
         for qid in amber_set["qids"]:
-            if amber_set["qids"][qid]["is_topdog"] == head_subset:
+            if amber_set["qids"][qid]["is_head"] == head_subset:
                 for query_dict in amber_set["qids"][qid]["queries"]:
                     query_id = query_dict["id"]
 
