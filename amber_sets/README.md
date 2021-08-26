@@ -20,6 +20,7 @@ Here is an example AmbER set for the name "Abe Lincoln" for the question answeri
 
 <details>
 <summary>Click to expand</summary>
+
 ```JSON
 {
     "name": "Abe Lincoln",
