@@ -129,3 +129,28 @@ Here is an example AmbER set for the name "Abe Lincoln" for the question answeri
 }
 ```
 </details>
+
+Here are some descriptions of important fields in each AmbER sets:
+* `qids`: `Dict[str]` Maps QIDs (entity IDs) to each entities' associated queries.
+
+* `is_head`: `Bool` Whether each entity (QID) is the head entity or not.
+
+* `popularity`: `float` Each entities popularity (log of number of page views).
+
+* `wikipedia`: `List[Dict]` The Wikipedia pages in the KILT dump which were associated with each entity. 
+  Each page dictionary contains the ID into the KILT dump (`wikipedia_id`) as well as the title of the page. 
+
+* `queries`: `List[Dict]` A list of instantiated queries for each entity. 
+  For question answering and slot filling, each relation gets turned into one query while for fact checking, each relation gets turned into two queries (one true, and one false).
+  
+* `query_id`: `str` Each query gets a unique query ID. The query ID is broken up into two parts which are delinated by a `=` token. 
+  The part before this token is the ID of the corresponding AmbER set tuple which can be used to index into the `amber_set_tuples.jsonl` file. 
+  The part after this token is the hash of the query string.
+
+* `provenance`: `List[Dict]` Each query gets a provenance field, which are Wikipedia pages that are considered gold documents. 
+  The `provenance` pages are a subset of each entities' `wikipedia` pages. 
+  The `wikipedia` pages which contain an answer in the first 350 tokens are treated as gold documents.
+
+* `meta`: `Dict` Contains information such as which property (PID) instantiated each query.
+
+
