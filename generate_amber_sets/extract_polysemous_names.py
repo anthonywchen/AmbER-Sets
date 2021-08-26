@@ -58,7 +58,8 @@ def main():
         choices=["human", "nonhuman"]
     )
     args = parser.parse_args()
-    good_pids_file = os.path.join("amber_sets", args.collection, "good_pids.json")
+    entity_types_to_distinguishing_properties_file = \
+        os.path.join("amber_sets", args.collection, "entity_types_to_distinguishing_properties.json")
     output_file = os.path.join("amber_sets", args.collection, "tmp/polysemous_names.jsonl")
 
     # Loads entities, then completes the dictionary
@@ -109,10 +110,11 @@ def main():
             polysemous_names[name][qid]['is_head'] = pop == max(pops)
 
     # Delete entities where they have an entity type that doesn't match our collection
-    good_pids = json.load(open(good_pids_file))
+    acceptable_entity_types = \
+        json.load(open(entity_types_to_distinguishing_properties_file)).keys()
     for qid in tqdm.tqdm(list(entities.keys()), desc="Deleting entities without matching entity types"):
         entity_types = set(entities[qid].get('entity_types', []))
-        if len(entity_types.intersection(good_pids)) == 0:
+        if len(entity_types.intersection(acceptable_entity_types)) == 0:
             del entities[qid]
 
     # Filter names with < 2 entities

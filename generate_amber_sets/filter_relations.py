@@ -25,10 +25,13 @@ def main():
     args = parser.parse_args()
 
     input_data_file = os.path.join("amber_sets", args.collection, "tmp/polysemous_names.jsonl")
-    good_pids_file = os.path.join("amber_sets", args.collection, "good_pids.json")
+    entity_types_to_distinguishing_properties_file = \
+        os.path.join("amber_sets", args.collection, "entity_types_to_distinguishing_properties.json")
     output_data_file = os.path.join("amber_sets", args.collection, "tmp/filtered_relations.jsonl")
     polysemous_names = list(jsonlines.open(input_data_file))
-    good_pids = json.load(open(good_pids_file))
+    entity_types_to_distinguishing_properties = json.load(open(
+        entity_types_to_distinguishing_properties_file
+    ))
 
     # Iterate through all polysemous names and their entities
     for d in tqdm.tqdm(polysemous_names, desc="Filtering relations"):
@@ -42,13 +45,16 @@ def main():
             entity_types = d['qids'][qid]['entity_types']
 
             # Stores the pre-specified relations that are informative for an entity type
-            informative_pids = list(itertools.chain(*[good_pids[et] for et in
-                                                      entity_types if et in good_pids]))
+            distinguishing_properties = list(itertools.chain(*[
+                entity_types_to_distinguishing_properties[et]
+                for et in entity_types
+                if et in entity_types_to_distinguishing_properties
+            ]))
 
             # Remove relations that aren't informative or are shared across entities or
             # don't have any values
             for pid in list(d['qids'][qid]['pids'].keys()):
-                if pid not in informative_pids or pid_counts[pid] > 1 or \
+                if pid not in distinguishing_properties or pid_counts[pid] > 1 or \
                         len(d['qids'][qid]['pids'][pid]['values']) == 0:
                     del d['qids'][qid]['pids'][pid]
 

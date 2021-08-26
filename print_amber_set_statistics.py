@@ -1,7 +1,6 @@
 import json
 from collections import defaultdict
 from os.path import join
-from pprint import pprint
 
 import jsonlines
 
