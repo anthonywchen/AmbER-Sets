@@ -1,6 +1,6 @@
 # Evaluation
 
-### Evaluation Retrieval System
+### Evaluate Retrieval System
 To evaluate your retrieval system, run:
 ```bash
 PYTHONPATH=. python evaluation/evaluate_retriever.py 
@@ -10,7 +10,7 @@ PYTHONPATH=. python evaluation/evaluate_retriever.py
     --output_file <output file> Optional file to write evaluation results to. If not provided, results will be printed.
 ```
 
-The evaluation script expects a prediction file in a JSONLines file with the following format.
+The evaluation script expects a prediction file in a JSONLines format where each line has the following structure.
 
 ```JSON
 {
