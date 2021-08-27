@@ -56,15 +56,15 @@ def print_instances_statistics(instances_file, task):
 
 def print_statistics(amber_subset):
     print("\nAmbER-" + amber_subset[0].upper(), "\n-------")
-    tuples_file = join("amber_sets", amber_subset, "amber_set_tuples.jsonl")
-    pids_file = join("amber_sets", amber_subset, "good_pids.json")
+    tuples_file = join("data", amber_subset, "amber_set_tuples.jsonl")
+    pids_file = join("data", amber_subset, "entity_types_to_distinguishing_properties .json")
     print_tuples_statistics(tuples_file, pids_file)
 
-    fc_file = join("amber_sets", amber_subset, "fc/amber_sets.jsonl")
+    fc_file = join("data", amber_subset, "fc/amber_sets.jsonl")
     print_instances_statistics(fc_file, "FC")
-    sf_file = join("amber_sets", amber_subset, "sf/amber_sets.jsonl")
+    sf_file = join("data", amber_subset, "sf/amber_sets.jsonl")
     print_instances_statistics(sf_file, "SF")
-    qa_file = join("amber_sets", amber_subset, "qa/amber_sets.jsonl")
+    qa_file = join("data", amber_subset, "qa/amber_sets.jsonl")
     print_instances_statistics(qa_file, "QA")
 
 

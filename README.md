@@ -7,15 +7,9 @@ Each AmbER set contains queries about entities which share a name.
 See our [**ACL 2021 paper**](https://arxiv.org/abs/2106.06830) to learn more about AmbER sets.
 
 ### Environment Setup
-To install the required packages, run 
-```
-pip install requirements.txt
-```
+To install the required packages, run `pip install requirements.txt`
 
-If you use Poetry, you can alternatively run 
-```
-poetry install
-```
+If you use Poetry, you can alternatively run `poetry install` followed by `poetry shell` to activate the poetry environment.
 
 ### Generating AmbER Sets
 AmbER sets are generated from Wikidata tuples and are aligned to a Wikipedia dump. 
@@ -23,7 +17,7 @@ To see replicate our pipeline, see the [generate_amber_sets](generate_amber_sets
 This step is optional as we provide the output of this step in the next section.
 
 ### Data
-The output of the generation pipeline is provided in the [amber_sets](amber_sets) directory.
+The AmbER sets, which are the output of the generation pipeline is provided in the [data](data) directory.
 See this directory for more information on the data.
 
 ### AmbER Sets Evaluation

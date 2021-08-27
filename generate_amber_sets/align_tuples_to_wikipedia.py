@@ -76,10 +76,10 @@ def main():
     args = parser.parse_args()
 
     input_data_file = os.path.join(
-        "amber_sets", args.collection, "tmp/filtered_relations.jsonl"
+        "data", args.collection, "tmp/filtered_relations.jsonl"
     )
     output_data_file = os.path.join(
-        "amber_sets", args.collection, "amber_set_tuples.jsonl"
+        "data", args.collection, "amber_set_tuples.jsonl"
     )
 
     polysemous_names = list(jsonlines.open(input_data_file))

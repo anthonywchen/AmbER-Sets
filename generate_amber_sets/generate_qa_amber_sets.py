@@ -95,9 +95,9 @@ def main():
     )
     args = parser.parse_args()
 
-    input_data_file = join("amber_sets", args.collection, "amber_set_tuples.jsonl")
-    templates_file = join("amber_sets", args.collection, "qa_templates.json")
-    output_data_file = join("amber_sets", args.collection, "qa/amber_sets.jsonl")
+    input_data_file = join("data", args.collection, "amber_set_tuples.jsonl")
+    templates_file = join("data", args.collection, "qa_templates.json")
+    output_data_file = join("data", args.collection, "qa/amber_sets.jsonl")
 
     amber_set_tuples = list(jsonlines.open(input_data_file))
     templates = json.load(open(templates_file))

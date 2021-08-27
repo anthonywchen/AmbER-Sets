@@ -75,8 +75,8 @@ def main():
     )
     args = parser.parse_args()
 
-    input_data_file = join("amber_sets", args.collection, "amber_set_tuples.jsonl")
-    output_data_file = join("amber_sets", args.collection, "sf/amber_sets.jsonl")
+    input_data_file = join("data", args.collection, "amber_set_tuples.jsonl")
+    output_data_file = join("data", args.collection, "sf/amber_sets.jsonl")
     amber_set_tuples = list(jsonlines.open(input_data_file))
     amber_sets = generate_slot_filling_dataset(amber_set_tuples)
 

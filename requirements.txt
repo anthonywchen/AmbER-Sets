@@ -1,4 +1,5 @@
-datasets==1.4.0
-inflect
-jsonlines
-ujson
+colorama==0.4.4; python_version >= "2.7" and python_full_version < "3.0.0" and platform_system == "Windows" or python_full_version >= "3.5.0" and platform_system == "Windows"
+inflect==5.3.0; python_version >= "3.6"
+jsonlines==2.0.0; python_version >= "3.6"
+tqdm==4.62.2; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.4.0")
+ujson==4.1.0; python_version >= "3.6"

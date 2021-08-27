@@ -57,8 +57,8 @@ def main():
     )
     args = parser.parse_args()
     entity_types_to_distinguishing_properties_file = \
-        os.path.join("amber_sets", args.collection, "entity_types_to_distinguishing_properties.json")
-    output_file = os.path.join("amber_sets", args.collection, "tmp/polysemous_names.jsonl")
+        os.path.join("data", args.collection, "entity_types_to_distinguishing_properties.json")
+    output_file = os.path.join("data", args.collection, "tmp/polysemous_names.jsonl")
 
     # Loads entities, then completes the dictionary
     entities = json.load(open(args.entity_file))
