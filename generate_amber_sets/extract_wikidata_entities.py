@@ -65,10 +65,12 @@ def extract_label(line):
 
 
 def extract_aliases(line):
-    """Extracts alternative English names for an entity"""
+    """Extracts all English names for an entity"""
+    label = extract_label(line)
+    aliases = [label] if label else []
     if 'en' in line['aliases']:
-        return [d['value'] for d in line['aliases']['en']]
-    return []
+        aliases += [d['value'] for d in line['aliases']['en']]
+    return aliases
 
 
 def extract_entity_types(line):
@@ -164,17 +166,15 @@ def main():
 
             # Current line is an entity
             if line["type"] == "item":
-                label = extract_label(line)
-                wikipedia_page = extract_wikipedia_page(line)
-                popularity = wiki_popularity.get(wikipedia_page)
+                aliases = extract_aliases(line)
+                popularity = wiki_popularity.get(extract_wikipedia_page(line))
 
                 # Skip if entity doesn't have name or English Wikipedia page views
-                if label is None or popularity is None:
+                if aliases == [] or popularity is None:
                     continue
 
                 info_dict = {
-                    "label": label,
-                    "aliases": extract_aliases(line),
+                    "aliases": aliases,
                     "entity_types": extract_entity_types(line),
                     "pids": extract_relations(line),
                     "popularity": popularity

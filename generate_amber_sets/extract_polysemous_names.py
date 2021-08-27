@@ -14,7 +14,7 @@ def extract_aliases_for_entity(entities, qid):
     aliases = []
     additional_aliases = set()
     if qid in entities:
-        aliases = set(entities[qid]['aliases'])
+        aliases = entities[qid]['aliases']
 
         # Add in aliases for the people who participated in the answer
         # e.g. for the alias guitar, we also add in guitarist
@@ -22,10 +22,8 @@ def extract_aliases_for_entity(entities, qid):
                      entities[qid]['pids'].get("P1535", {}).get("values", []):
             pqid = value["qid"]  # pqid = participant QID
             if pqid in entities:
-                additional_aliases.update([entities[pqid]['label']] + entities[pqid]['aliases'])
+                additional_aliases.update(entities[pqid]['aliases'])
 
-        # Ensures label is always first element in aliases
-        aliases = [entities[qid]['label']] + sorted(aliases)
     return aliases, list(sorted(additional_aliases))
 
 
@@ -72,7 +70,7 @@ def main():
             continue
 
         # Map all names to the current entity and store popularity
-        for name in [entities[qid]['label']] + entities[qid]['aliases']:
+        for name in entities[qid]['aliases']:
             polysemous_names[name][qid] = {'popularity': entities[qid]['popularity']}
 
         # Iterate through all relations for the current entity

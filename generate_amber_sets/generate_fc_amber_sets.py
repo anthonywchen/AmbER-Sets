@@ -101,16 +101,14 @@ def generate_queries(amber_set_tuples, templates):
                     {
                         "id": pid_dict[pid]["amber_id"] + "=" + true_query_id,
                         "input": true_query,
-                        "output": [
-                            {
+                        "output": {
                                 "answer": "SUPPORTS",
                                 "provenance": pid_dict[pid]["provenance"],
                                 "meta": {
                                     "values": values,
                                     "additional_values": additional_values,
                                 },
-                            }
-                        ],
+                        },
                         "meta": {"pid": pid},
                     }
                 )
