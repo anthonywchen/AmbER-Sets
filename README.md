@@ -1,5 +1,5 @@
 # AmbER Sets
-[**Data**](#AmbER Sets Data) |
+[**Data**](#Data) |
 [**Citation**](#Citation) | [**License**](#License) | [**Paper**](https://arxiv.org/abs/2106.06830) | [**Landing Page**](https://machinelearning.apple.com/research/evaluating-entity-disambiguation-amber)
 
 **AmbER** (**Amb**igiuous **E**ntity **R**etrieval) sets are collections of queries which individually test a retriever's ability to do entity disambiguation.
@@ -10,7 +10,7 @@ See our [**ACL 2021 paper**](https://arxiv.org/abs/2106.06830) for more details 
 
 ### Generating AmbER Sets
 
-### AmbER Sets Data
+### Data
 
 ### AmbER Sets Evaluation
 
