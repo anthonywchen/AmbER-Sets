@@ -6,8 +6,9 @@ import string
 
 #### Downstream Metrics
 def normalize_answer(s):
-    """Lower text and remove punctuation, articles and extra whitespace."""
-
+    """Lower text and remove punctuation, articles and extra whitespace.
+    This function is an extended version of the SQuAD evaluation script.
+    """
     def remove_articles(text):
         regex = re.compile(r"\b(a|an|the)\b", re.UNICODE)
         return re.sub(regex, " ", text)

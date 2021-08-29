@@ -4,7 +4,7 @@
 To evaluate your retrieval system, run:
 ```bash
 PYTHONPATH=. python evaluation/evaluate_retriever.py 
-    --annotations_file amber_sets/<collection>/<task>/amber_sets.jsonl \
+    --annotations_file data/<collection>/<task>/amber_sets.jsonl \
     --predictions_file <predictions_file>
     --k <top k retreived documents to evaluate with>
     --output_file <output file> Optional file to write evaluation results to. If not provided, results will be printed.
