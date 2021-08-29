@@ -19,12 +19,13 @@ import argparse
 import bz2
 import collections
 import math
+import typing
 
 import tqdm
 import ujson as json
 
 
-def dumb_filter(line):
+def dumb_filter(line: str) -> bool:
     """Does a simple check on a Wikidata line that is a dictionary in string format.
     The reason is that json.loads() is slow, and if we can do some filtering
     before running it, that speeds up code. Removing this function call should not
@@ -33,7 +34,7 @@ def dumb_filter(line):
     return "\"enwiki\"" not in line and "\"type\":\"item\"" in line
 
 
-def extract_popularities(popularity_dump):
+def extract_popularities(popularity_dump: str) -> typing.Dict[str, float]:
     """Iterate through the Wikipedia popularity dump without decompressing
     it, storing each English Wikipedia page's number of page views.
 
@@ -41,8 +42,8 @@ def extract_popularities(popularity_dump):
         popularity_dump: ``str`` A path to a .BZ2 file containing Wikipedia
         page views for a day.
     Returns:
-        wiki_popularity: ``dict`` Maps from a Wikipedia page to the daily
-        page view count.
+        wiki_popularity: ``dict`` Maps from a Wikipedia page to the monthly
+        popularity.
     """
     wiki_popularity = {}
     with bz2.open(popularity_dump, "rt") as file:
@@ -57,14 +58,14 @@ def extract_popularities(popularity_dump):
     return wiki_popularity
 
 
-def extract_label(line):
+def extract_label(line: dict) -> str:
     """Extracts the English label (canonical name) for an entity"""
     if 'en' in line['labels']:
         return line['labels']['en']['value']
     return None
 
 
-def extract_aliases(line):
+def extract_aliases(line: dict) -> typing.List[str]:
     """Extracts all English names for an entity"""
     label = extract_label(line)
     aliases = [label] if label else []
@@ -73,7 +74,7 @@ def extract_aliases(line):
     return aliases
 
 
-def extract_entity_types(line):
+def extract_entity_types(line: dict) -> typing.List[str]:
     """Extracts the entity type for an entity"""
     entity_types = []
     # P31 is "instance of". We define these to represent entity types.
@@ -84,14 +85,14 @@ def extract_entity_types(line):
     return entity_types
 
 
-def extract_wikipedia_page(line):
+def extract_wikipedia_page(line: dict) -> str:
     """Extracts the Wikipedia page for an entity"""
     if 'sitelinks' in line and 'enwiki' in line['sitelinks']:
         return line['sitelinks']['enwiki']['title'].strip().replace(" ", "_")
     return None
 
 
-def extract_relations(line):
+def extract_relations(line: dict) -> typing.Dict[str, typing.Dict]:
     """Extracts all relations for each entity line where the value of the relation
     is either an entity or a quantity.
     """
@@ -122,7 +123,7 @@ def extract_relations(line):
     return relations
 
 
-def main():
+def main() -> None:
     """For each Wikidata entity in the Wikidata dump, we extract out it's entity
     type, associated Wikipedia page (used for popularity), all aliases
     for the entity, and popularity of the entity's Wikipedia page, then write

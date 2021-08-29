@@ -14,7 +14,7 @@ import jsonlines
 import tqdm
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-c", "--collection",

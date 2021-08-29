@@ -5,6 +5,7 @@ import hashlib
 import itertools
 import json
 import os
+import typing
 
 import jsonlines
 import tqdm
@@ -12,7 +13,7 @@ import tqdm
 from evaluation.utils import get_tokens
 
 
-def answer_in_doc(answer, doc):
+def answer_in_doc(answer: str, doc: str) -> bool:
     answer_tokens = get_tokens(answer)
     doc_tokens = get_tokens(doc)
 
@@ -24,14 +25,14 @@ def answer_in_doc(answer, doc):
     return False
 
 
-def create_amber_id(name, qid, pid):
+def create_amber_id(name: str, qid: str, pid: str) -> str:
     """For each (name, QID, PID), we compute a unique AmbER set tuple ID"""
     hash_input = repr([name, qid, pid]).encode()
     md5 = hashlib.md5(hash_input).hexdigest()
     return md5
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-w",

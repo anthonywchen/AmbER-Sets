@@ -1,6 +1,7 @@
 import argparse
 import collections
 import os
+import typing
 
 import inflect
 import ujson as json
@@ -9,7 +10,9 @@ import tqdm
 engine = inflect.engine()
 
 
-def extract_aliases_for_entity(entities, qid):
+def extract_aliases_for_entity(
+    entities: dict, qid: str
+) -> typing.Tuple[typing.List[str], typing.List[str]]:
     """Extracts aliases for a Wikidata entity"""
     aliases = []
     additional_aliases = set()
@@ -27,7 +30,9 @@ def extract_aliases_for_entity(entities, qid):
     return aliases, list(sorted(additional_aliases))
 
 
-def extract_aliases_for_quantity(amount):
+def extract_aliases_for_quantity(
+    amount: str
+) -> typing.Tuple[typing.List[str], typing.List[str]]:
     """Extracts aliases for a numerical value"""
     assert amount[0] in ["+", "-"]
     aliases = [amount[1:]]
@@ -38,12 +43,12 @@ def extract_aliases_for_quantity(amount):
     return aliases, additional_aliases
 
 
-def extract_entity_types(entities, qid):
+def extract_entity_types(entities: dict, qid: str) -> typing.List[str]:
     """Returns entity types for a specified entity"""
     return entities.get(qid, {}).get("entity_types", [])
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-e", "--entity_file",
