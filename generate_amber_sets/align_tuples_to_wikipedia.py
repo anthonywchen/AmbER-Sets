@@ -29,7 +29,7 @@ def answer_in_doc(answer: str, doc: str) -> bool:
 
     # Test that answer tokens are a sublist of doc tokens
     if answer_tokens in [
-        doc_tokens[i:len(answer_tokens)+i] for i in range(len(doc_tokens))
+        doc_tokens[i : len(answer_tokens) + i] for i in range(len(doc_tokens))
     ]:
         return True
     return False
@@ -72,43 +72,45 @@ def align_tuples_to_wikipedia(wikipedia_dump: str, collection: str) -> None:
     polysemous_names = list(jsonlines.open(input_data_file))
 
     # Keep track of all entities that are in our polysemous names set
-    qids = set(itertools.chain(*[d['qids'].keys() for d in polysemous_names]))
+    qids = set(itertools.chain(*[d["qids"].keys() for d in polysemous_names]))
 
     # Store a mapping of QIDs that are in our set to associated Wikipedia dictionary
     qid_to_wikipedia = collections.defaultdict(list)
     with open(wikipedia_dump) as reader:
         for line in tqdm.tqdm(reader, desc="Loading Wikipedia articles"):
             line = json.loads(line)
-            if 'wikidata_info' in line:
-                qid = line['wikidata_info']['wikidata_id']
+            if "wikidata_info" in line:
+                qid = line["wikidata_info"]["wikidata_id"]
                 if qid in qids:
                     qid_to_wikipedia[qid].append(line)
 
     # Add Wikipedia information to each entity in the tuples and filter
     # unanswerable relations
     for d in tqdm.tqdm(polysemous_names, desc="Aligning entities to Wikipedia"):
-        for qid in list(d['qids']):
+        for qid in list(d["qids"]):
             # Grabs all Wikipedia articles for the current QID
-            d['qids'][qid]['wikipedia'] = []
+            d["qids"][qid]["wikipedia"] = []
             articles = qid_to_wikipedia.get(qid, [])
 
             for article in articles:
-                d['qids'][qid]['wikipedia'].append({
-                    'wikipedia_id': article['wikipedia_id'],
-                    'title': article['wikipedia_title']
-                })
+                d["qids"][qid]["wikipedia"].append(
+                    {
+                        "wikipedia_id": article["wikipedia_id"],
+                        "title": article["wikipedia_title"],
+                    }
+                )
 
             # Filter unanswerable relations
-            for pid in list(d['qids'][qid]['pids']):
+            for pid in list(d["qids"][qid]["pids"]):
                 # The provenance of each relation is documents that correspond to the
                 # current entity that also contain aliases of the current relation
-                d['qids'][qid]['pids'][pid]['provenance'] = []
+                d["qids"][qid]["pids"][pid]["provenance"] = []
 
                 # Iterate through each Wikipedia article, and check that the value of
                 # the current relation has value aliases in the Wikipedia article. If
                 # so, we treat the article as a "gold" document and mark
                 # that this value appeared in a gold document
-                for value in d['qids'][qid]['pids'][pid]["values"]:
+                for value in d["qids"][qid]["pids"][pid]["values"]:
                     found_in_passage = False
                     for answer in value["aliases"]:
                         for article in articles:
@@ -116,34 +118,36 @@ def align_tuples_to_wikipedia(wikipedia_dump: str, collection: str) -> None:
                             doc = " ".join(doc.split()[:350])
                             if answer_in_doc(answer, doc):
                                 provenance_dict = {
-                                    'wikipedia_id': article['wikipedia_id'],
-                                    'title': article['wikipedia_title']
+                                    "wikipedia_id": article["wikipedia_id"],
+                                    "title": article["wikipedia_title"],
                                 }
-                                if provenance_dict not in \
-                                        d['qids'][qid]['pids'][pid]['provenance']:
-                                    d['qids'][qid]['pids'][pid]['provenance'].append(
+                                if (
+                                    provenance_dict
+                                    not in d["qids"][qid]["pids"][pid]["provenance"]
+                                ):
+                                    d["qids"][qid]["pids"][pid]["provenance"].append(
                                         provenance_dict
                                     )
                                 found_in_passage = True
-                    value['found_in_passage'] = found_in_passage
+                    value["found_in_passage"] = found_in_passage
 
                 # Delete relation if no article had an answer in the document
-                if len(d['qids'][qid]['pids'][pid]['provenance']) == 0:
-                    del d['qids'][qid]['pids'][pid]
+                if len(d["qids"][qid]["pids"][pid]["provenance"]) == 0:
+                    del d["qids"][qid]["pids"][pid]
 
             # If the current QID doesn't have any Wikipedia articles, delete it
-            if d['qids'][qid]['wikipedia'] == []:
-                del d['qids'][qid]
+            if d["qids"][qid]["wikipedia"] == []:
+                del d["qids"][qid]
 
     # Filter names with < 2 entities with relations or no head entity with relations
     filtered_names = []
     for d in polysemous_names:
         entities_with_relations = 0
         head_has_relations = False
-        for qid in d['qids']:
-            if len(d['qids'][qid]['pids']) > 0:
+        for qid in d["qids"]:
+            if len(d["qids"][qid]["pids"]) > 0:
                 entities_with_relations += 1
-                if d['qids'][qid]['is_head']:
+                if d["qids"][qid]["is_head"]:
                     head_has_relations = True
 
         if entities_with_relations >= 2 and head_has_relations:
@@ -151,10 +155,11 @@ def align_tuples_to_wikipedia(wikipedia_dump: str, collection: str) -> None:
 
     # Add AmbER set tuple IDs
     for d in filtered_names:
-        for qid in d['qids']:
-            for pid in d['qids'][qid]['pids']:
-                d['qids'][qid]['pids'][pid]['amber_id'] = \
-                    create_amber_id(d['name'], qid, pid)
+        for qid in d["qids"]:
+            for pid in d["qids"][qid]["pids"]:
+                d["qids"][qid]["pids"][pid]["amber_id"] = create_amber_id(
+                    d["name"], qid, pid
+                )
 
     # Sort list of AmbER set tuples by the name
     filtered_names = sorted(filtered_names, key=lambda k: k["name"])
@@ -168,14 +173,16 @@ def align_tuples_to_wikipedia(wikipedia_dump: str, collection: str) -> None:
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "-w", "--wikipedia_dump",
-        help=".json KILT Wikipedia dump for aligning entities to Wikipedia articles"
+        "-w",
+        "--wikipedia_dump",
+        help=".json KILT Wikipedia dump for aligning entities to Wikipedia articles",
     )
     parser.add_argument(
-        "-c", "--collection",
+        "-c",
+        "--collection",
         help="Collection to collect polysemous names for, AmbER-H (human) or "
-             "AmbER-N (nonhuman)",
-        choices=["human", "nonhuman"]
+        "AmbER-N (nonhuman)",
+        choices=["human", "nonhuman"],
     )
     args = parser.parse_args()
 

@@ -11,6 +11,7 @@ def normalize_answer(s):
     Arguments:
         s: ``str`` String to normalize.
     """
+
     def remove_articles(text):
         regex = re.compile(r"\b(a|an|the)\b", re.UNICODE)
         return re.sub(regex, " ", text)

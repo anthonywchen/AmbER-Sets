@@ -27,7 +27,7 @@ def extract_page_ids(pages: typing.List[dict]) -> typing.List[str]:
             dictionary.
     """
     # Extract list of page IDs from list of Wikipedia dictionaries
-    page_ids = [page['wikipedia_id'] for page in pages]
+    page_ids = [page["wikipedia_id"] for page in pages]
 
     # Remove duplicates in the list of page IDs while preserving order
     seen_ids = set()
@@ -39,15 +39,13 @@ def extract_page_ids(pages: typing.List[dict]) -> typing.List[str]:
     page_ids = tmp
 
     # Fix errors by removing "None" page IDs
-    page_ids = [id for id in page_ids if id != 'None']
+    page_ids = [id for id in page_ids if id != "None"]
 
     return page_ids
 
 
 def accuracy_at_k(
-    gold_pages: typing.List[dict],
-    retrieved_pages: typing.List[dict],
-    k: int
+    gold_pages: typing.List[dict], retrieved_pages: typing.List[dict], k: int
 ) -> int:
     """Computes the retrieval accuracy@k metric.
 
@@ -64,9 +62,7 @@ def accuracy_at_k(
 
 
 def get_raw_metrics(
-    amber_sets: typing.List[dict],
-    predictions: typing.Dict[str, dict],
-    k: int
+    amber_sets: typing.List[dict], predictions: typing.Dict[str, dict], k: int
 ) -> typing.Dict[str, int]:
     """Computes accuracy scores at a per-query level.
 
@@ -80,24 +76,24 @@ def get_raw_metrics(
     raw_metrics = collections.defaultdict(dict)
 
     for amber_set in amber_sets:
-        for qid in amber_set['qids']:
+        for qid in amber_set["qids"]:
             # Iterate through queries for current entity
-            for query_dict in amber_set['qids'][qid]['queries']:
-                query_id = query_dict['id']
+            for query_dict in amber_set["qids"][qid]["queries"]:
+                query_id = query_dict["id"]
                 if query_id not in predictions:
-                    print('Missing prediction for %s' % query_id)
+                    print("Missing prediction for %s" % query_id)
 
-                gold_pages = query_dict['output']['provenance']
-                retr_pages = predictions[query_id]['output']['provenance']
-                raw_metrics['accuracy'][query_id] = \
-                    accuracy_at_k(gold_pages, retr_pages, k)
+                gold_pages = query_dict["output"]["provenance"]
+                retr_pages = predictions[query_id]["output"]["provenance"]
+                raw_metrics["accuracy"][query_id] = accuracy_at_k(
+                    gold_pages, retr_pages, k
+                )
 
     return raw_metrics
 
 
 def consistency_at_k(
-    amber_sets: typing.List[dict],
-    raw_metrics: typing.Dict[str, int]
+    amber_sets: typing.List[dict], raw_metrics: typing.Dict[str, int]
 ) -> float:
     """Computes the set-level consistency metric.
 
@@ -114,26 +110,26 @@ def consistency_at_k(
 
     for amber_set in amber_sets:
         # Get all query IDs for the AmbER set
-        query_ids = [query_dict['id'] for qid in amber_set['qids']
-                     for query_dict in amber_set['qids'][qid]['queries']]
+        query_ids = [
+            query_dict["id"]
+            for qid in amber_set["qids"]
+            for query_dict in amber_set["qids"][qid]["queries"]
+        ]
 
         # Get accuracy scores for all query IDs
-        scores = [raw_metrics['accuracy'][query_id] for query_id in query_ids]
+        scores = [raw_metrics["accuracy"][query_id] for query_id in query_ids]
 
         # If all accuracy scores were `1`, then the retriever was consistent
         is_consistent = int(len(scores) == sum(scores))
         consistency_scores.append(is_consistent)
 
     # Average consistency across AmbER sets
-    consistency = 100*statistics.mean(consistency_scores)
+    consistency = 100 * statistics.mean(consistency_scores)
     return consistency
 
 
 def evaluate_retriever(
-    annotations_file: str,
-    predictions_file: str,
-    k: int,
-    metrics_dir: str = None
+    annotations_file: str, predictions_file: str, k: int, metrics_dir: str = None
 ) -> None:
     """Computes accuracy (overall and by head/tail) and consistency metrics.
 
@@ -149,28 +145,28 @@ def evaluate_retriever(
         metrics_dir: ``str`` (Optional) Directory to write metric scores.
     """
     amber_sets = list(jsonlines.open(annotations_file))
-    predictions = {d['id']: d for d in jsonlines.open(predictions_file)}
+    predictions = {d["id"]: d for d in jsonlines.open(predictions_file)}
 
     # `raw_metrics` are the individual scores for each query
     raw_metrics = get_raw_metrics(amber_sets, predictions, k)
 
     # `metrics` aggregates the raw metrics into average scores
-    metrics = {m: 100*statistics.mean(raw_metrics[m].values()) for m in raw_metrics}
+    metrics = {m: 100 * statistics.mean(raw_metrics[m].values()) for m in raw_metrics}
 
     # For the scores in `metrics`, we split them based on head/tail entities
-    metrics['head'] = get_subset_scores(amber_sets, raw_metrics, True)
-    metrics['tail'] = get_subset_scores(amber_sets, raw_metrics, False)
+    metrics["head"] = get_subset_scores(amber_sets, raw_metrics, True)
+    metrics["tail"] = get_subset_scores(amber_sets, raw_metrics, False)
 
     # `consistency` is the % of AmbER sets where all queries in the set were retrieved
-    metrics['consistency'] = consistency_at_k(amber_sets, raw_metrics)
+    metrics["consistency"] = consistency_at_k(amber_sets, raw_metrics)
 
     if metrics_dir:
-        metrics_file = os.path.join(metrics_dir, f'metrics@{k}.json')
-        with open(metrics_file, 'w') as f:
+        metrics_file = os.path.join(metrics_dir, f"metrics@{k}.json")
+        with open(metrics_file, "w") as f:
             f.write(json.dumps(metrics, indent=4))
 
-        raw_metrics_file = os.path.join(metrics_dir, f'raw_metrics@{k}.json')
-        with open(raw_metrics_file, 'w') as f:
+        raw_metrics_file = os.path.join(metrics_dir, f"raw_metrics@{k}.json")
+        with open(raw_metrics_file, "w") as f:
             f.write(json.dumps(raw_metrics, indent=4))
     else:
         print(json.dumps(metrics, indent=4))
@@ -179,34 +175,32 @@ def evaluate_retriever(
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "-a", "--annotations_file",
-        help="Path to the AmbER sets file",
-        required=True
+        "-a", "--annotations_file", help="Path to the AmbER sets file", required=True
     )
     parser.add_argument(
-        "-p", "--predictions_file",
+        "-p",
+        "--predictions_file",
         help="Path to retrieved documents file corresponding to AmbER sets",
-        required=True
+        required=True,
     )
     parser.add_argument(
-        "-k", "--k",
+        "-k",
+        "--k",
         help="Used to compute accuracy@k. By default, we compute accuracy@1.",
         type=int,
-        default=1
+        default=1,
     )
     parser.add_argument(
-        "-m", "--metrics_dir",
+        "-m",
+        "--metrics_dir",
         required=False,
         help="The directory to which we write out the metrics."
-             " If not provided, we print metrics."
+        " If not provided, we print metrics.",
     )
     args = parser.parse_args()
 
     evaluate_retriever(
-        args.annotations_file,
-        args.predictions_file,
-        args.k,
-        args.metrics_dir
+        args.annotations_file, args.predictions_file, args.k, args.metrics_dir
     )
 
 

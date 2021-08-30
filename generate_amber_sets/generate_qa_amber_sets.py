@@ -106,10 +106,11 @@ def generate_qa_amber_sets(collection: str) -> None:
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "-c", "--collection",
+        "-c",
+        "--collection",
         help="Collection to collect polysemous names for, AmbER-H (human) or "
-             "AmbER-N (nonhuman)",
-        choices=["human", "nonhuman"]
+        "AmbER-N (nonhuman)",
+        choices=["human", "nonhuman"],
     )
     args = parser.parse_args()
 

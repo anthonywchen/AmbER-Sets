@@ -31,9 +31,7 @@ def fill_template(template: str, entity: str, object: str) -> typing.Tuple[str, 
 
 
 def generate_true_instance(
-    template: str,
-    entity_name: str,
-    pid_dict: typing.Dict[str, dict]
+    template: str, entity_name: str, pid_dict: typing.Dict[str, dict]
 ) -> typing.Tuple[str, str]:
     """Creates a true fact checking query.
 
@@ -49,8 +47,8 @@ def generate_true_instance(
         query: ``str`` A true fact checking query.
         query_hashlib: ``str`` A MD5 hash of the query.
     """
-    for value in pid_dict['values']:
-        if value['found_in_passage']:
+    for value in pid_dict["values"]:
+        if value["found_in_passage"]:
             answer = value["aliases"][0]
             query, query_hashlib = fill_template(template, entity_name, answer)
             break
@@ -61,7 +59,7 @@ def generate_false_instance(
     template: str,
     entity_name: str,
     pid_dict: typing.Dict[str, dict],
-    other_answers: typing.List[str]
+    other_answers: typing.List[str],
 ) -> typing.Tuple[str, str]:
     """Creates a false fact checking query.
 
@@ -79,7 +77,7 @@ def generate_false_instance(
         query: ``str`` A false fact checking query.
         query_hashlib: ``str`` A MD5 hash of the query.
     """
-    answers = [value['aliases'][0] for value in pid_dict["values"]]
+    answers = [value["aliases"][0] for value in pid_dict["values"]]
     for wrong_answer in other_answers:
         if wrong_answer not in answers:
             query, query_hashlib = fill_template(template, entity_name, wrong_answer)
@@ -102,9 +100,9 @@ def generate_fc_amber_sets(collection: str) -> None:
     # Get the most popular values for each PID
     popular_pid_values = defaultdict(lambda: defaultdict(int))
     for d in tqdm(amber_set_tuples):
-        for qid in d['qids']:
-            for pid in d['qids'][qid]['pids']:
-                for value in d['qids'][qid]['pids'][pid]['values']:
+        for qid in d["qids"]:
+            for pid in d["qids"][qid]["pids"]:
+                for value in d["qids"][qid]["pids"][pid]["values"]:
                     answer = value["aliases"][0]
                     popular_pid_values[pid][answer] += 1
 
@@ -158,12 +156,12 @@ def generate_fc_amber_sets(collection: str) -> None:
                         "id": pid_dict[pid]["amber_id"] + "=" + true_query_id,
                         "input": true_query,
                         "output": {
-                                "answer": "SUPPORTS",
-                                "provenance": pid_dict[pid]["provenance"],
-                                "meta": {
-                                    "values": values,
-                                    "additional_values": additional_values,
-                                },
+                            "answer": "SUPPORTS",
+                            "provenance": pid_dict[pid]["provenance"],
+                            "meta": {
+                                "values": values,
+                                "additional_values": additional_values,
+                            },
                         },
                         "meta": {"pid": pid},
                     }
@@ -195,10 +193,11 @@ def generate_fc_amber_sets(collection: str) -> None:
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "-c", "--collection",
+        "-c",
+        "--collection",
         help="Collection to collect polysemous names for, AmbER-H (human) or "
-             "AmbER-N (nonhuman)",
-        choices=["human", "nonhuman"]
+        "AmbER-N (nonhuman)",
+        choices=["human", "nonhuman"],
     )
     args = parser.parse_args()
 

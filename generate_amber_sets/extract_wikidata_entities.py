@@ -22,7 +22,7 @@ def dumb_filter(line: str) -> bool:
     Returns:
         ``bool`` Whether the current line is for an entity with an English article
     """
-    return "\"enwiki\"" not in line and "\"type\":\"item\"" in line
+    return '"enwiki"' not in line and '"type":"item"' in line
 
 
 def extract_popularities(popularity_dump: str) -> typing.Dict[str, float]:
@@ -58,8 +58,8 @@ def extract_label(line: dict) -> str:
     Returns:
         ``str`` Canonical English name for the entity.
     """
-    if 'en' in line['labels']:
-        return line['labels']['en']['value']
+    if "en" in line["labels"]:
+        return line["labels"]["en"]["value"]
     return None
 
 
@@ -73,8 +73,8 @@ def extract_aliases(line: dict) -> typing.List[str]:
     """
     label = extract_label(line)
     aliases = [label] if label else []
-    if 'en' in line['aliases']:
-        aliases += [d['value'] for d in line['aliases']['en']]
+    if "en" in line["aliases"]:
+        aliases += [d["value"] for d in line["aliases"]["en"]]
     return aliases
 
 
@@ -89,10 +89,12 @@ def extract_entity_types(line: dict) -> typing.List[str]:
     """
     entity_types = []
     # P31 is "instance of". We define these to represent entity types.
-    for entry in line['claims'].get('P31', []):
-        if entry['mainsnak']['datatype'] == 'wikibase-item' and \
-                'datavalue' in entry['mainsnak']:
-            entity_types.append(entry['mainsnak']['datavalue']['value']['id'])
+    for entry in line["claims"].get("P31", []):
+        if (
+            entry["mainsnak"]["datatype"] == "wikibase-item"
+            and "datavalue" in entry["mainsnak"]
+        ):
+            entity_types.append(entry["mainsnak"]["datavalue"]["value"]["id"])
     return entity_types
 
 
@@ -104,8 +106,8 @@ def extract_wikipedia_page(line: dict) -> str:
     Returns:
         ``str`` Title of the of the Wikipedia article for the entity
     """
-    if 'sitelinks' in line and 'enwiki' in line['sitelinks']:
-        return line['sitelinks']['enwiki']['title'].strip().replace(" ", "_")
+    if "sitelinks" in line and "enwiki" in line["sitelinks"]:
+        return line["sitelinks"]["enwiki"]["title"].strip().replace(" ", "_")
     return None
 
 
@@ -123,25 +125,29 @@ def extract_relations(line: dict) -> typing.Dict[str, dict]:
     """
     relations = collections.defaultdict(lambda: collections.defaultdict(list))
 
-    for relation_id in line['claims']:
+    for relation_id in line["claims"]:
         # Each relation may have multiple values. Iterate through those values.
-        for entry in line['claims'][relation_id]:
-            if 'datavalue' in entry['mainsnak']:
-                answer_type = entry['mainsnak']['datatype']
+        for entry in line["claims"][relation_id]:
+            if "datavalue" in entry["mainsnak"]:
+                answer_type = entry["mainsnak"]["datatype"]
 
                 # Check that the current answer is an entity
-                if answer_type == 'wikibase-item':
-                    relations[relation_id]['values'].append({
-                        "type": answer_type,
-                        "qid": entry['mainsnak']['datavalue']['value']['id']
-                    })
+                if answer_type == "wikibase-item":
+                    relations[relation_id]["values"].append(
+                        {
+                            "type": answer_type,
+                            "qid": entry["mainsnak"]["datavalue"]["value"]["id"],
+                        }
+                    )
                 # Check that the current answer is an quantity
                 elif answer_type == "quantity":
-                    relations[relation_id]['values'].append({
-                        "type": answer_type,
-                        "amount": entry['mainsnak']["datavalue"]["value"]["amount"],
-                        "unit": entry['mainsnak']["datavalue"]["value"]["unit"]
-                    })
+                    relations[relation_id]["values"].append(
+                        {
+                            "type": answer_type,
+                            "amount": entry["mainsnak"]["datavalue"]["value"]["amount"],
+                            "unit": entry["mainsnak"]["datavalue"]["value"]["unit"],
+                        }
+                    )
                 else:  # Skip answers that are strings, GPS location, etc.
                     continue
 
@@ -149,9 +155,7 @@ def extract_relations(line: dict) -> typing.Dict[str, dict]:
 
 
 def extract_wikidata_entities(
-    wikidata_dump: str,
-    popularity_dump: str,
-    output_file: str
+    wikidata_dump: str, popularity_dump: str, output_file: str
 ) -> None:
     """Extracts Wikidata entity information from various dumps.
 
@@ -195,7 +199,7 @@ def extract_wikidata_entities(
                     "aliases": aliases,
                     "entity_types": extract_entity_types(line),
                     "pids": extract_relations(line),
-                    "popularity": popularity
+                    "popularity": popularity,
                 }
             # Current line is a property
             elif line["type"] == "property":
@@ -208,8 +212,10 @@ def extract_wikidata_entities(
                 writer.write(",\n")
             first_line_written = True
 
-            writer.write(f"{json.dumps(line['id'])}: "
-                         f"{json.dumps(info_dict, ensure_ascii=False)}")
+            writer.write(
+                f"{json.dumps(line['id'])}: "
+                f"{json.dumps(info_dict, ensure_ascii=False)}"
+            )
 
     writer.write("\n}")
     writer.close()
@@ -218,23 +224,22 @@ def extract_wikidata_entities(
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "-w", "--wikidata_dump",
-        help=".json.bz2 Wikidata dump for information extraction"
+        "-w",
+        "--wikidata_dump",
+        help=".json.bz2 Wikidata dump for information extraction",
     )
     parser.add_argument(
-        "-p", "--popularity_dump",
-        help=".bz2 Wikipedia popularity dump"
+        "-p", "--popularity_dump", help=".bz2 Wikipedia popularity dump"
     )
     parser.add_argument(
-        "-o", "--output_file",
-        help="Output JSON file for writing Wikidata entity information"
+        "-o",
+        "--output_file",
+        help="Output JSON file for writing Wikidata entity information",
     )
     args = parser.parse_args()
 
     extract_wikidata_entities(
-        args.wikidata_dump,
-        args.popularity_dump,
-        args.output_file
+        args.wikidata_dump, args.popularity_dump, args.output_file
     )
 
 
