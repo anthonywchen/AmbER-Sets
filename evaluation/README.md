@@ -1,6 +1,5 @@
 # Evaluation
 
-### Evaluate Retrieval System
 We have created our own evaluation script given your retriever's predictions on the KILT Wikipedia dump. 
 To handle how different retrievers create passages out of documents (TF-IDF does not create passages while DPR does), our evaluation script computes document-level metrics.
  That is, if your retriever has retrieved multiple passages from the same document, the script will take the highest scoring passage as the rank of the document. 
