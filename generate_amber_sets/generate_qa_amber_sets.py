@@ -1,7 +1,4 @@
-""" Generates question answering data from AmbER tuples with query templates
-
-
-"""
+#!/usr/bin/python3
 import argparse
 import hashlib
 import json

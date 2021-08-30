@@ -1,7 +1,4 @@
-""" Generates fact checking data from AmbER tuples with declarative templates
-
-
-"""
+#!/usr/bin/python3
 import argparse
 import hashlib
 import json

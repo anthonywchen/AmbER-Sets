@@ -1,7 +1,4 @@
-""" Generates slot filling data from AmbER tuples
-
-
-"""
+#!/usr/bin/python3
 import argparse
 import hashlib
 import json
