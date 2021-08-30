@@ -10,20 +10,9 @@ PYTHONPATH=. python evaluation/evaluate_retriever.py
     --output_file <output file> Optional file to write evaluation results to. If not provided, results will be printed.
 ```
 
-The evaluation script expects a prediction file in a JSONLines format where each line has the following structure.
-
+The evaluation script expects a prediction file in a JSONLines format where each line has the following structure. E.g.,
 ```JSON
-{
-  "id": "5f04dd5c7058b01405e64ddd3f59a8da=b33f81c2bbb8f9762333f843de698c8a",
-  "output": {
-    "provenance": [
-      {"wikipedia_id": "6404979"}, 
-      {"wikipedia_id": "33169245"}, 
-      {"wikipedia_id": "5197325"},
-      ...
-    ]
-  }
-}
+{"id": "5f04dd5c7058b01405e64ddd3f59a8da=b33f81c2bbb8f9762333f843de698c8a", "output": {"provenance": [{"wikipedia_id": "6404979"}, {"wikipedia_id": "33169245"}, {"wikipedia_id": "5197325"}, ...]}}
 ```
 
 * `id`: The ID of the query in the annotations file the line corresponds to.
