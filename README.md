@@ -47,4 +47,4 @@ To evaluate your retriever's predictions on AmbER sets, see the [evaluation](eva
 The AmbER data is licensed under the [Creative Commons Zero v1.0 Universal License](https://creativecommons.org/publicdomain/zero/1.0/).
 
 ### Contact
-For questions or inquires on AmbER sets, please contact Anthony Chen at <anthony.chen@uci.edu>.
+For questions or comments on AmbER sets, please open a pull request or contact Anthony Chen at <anthony.chen@uci.edu>.
