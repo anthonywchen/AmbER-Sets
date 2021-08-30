@@ -1,11 +1,10 @@
-""" Maps QIDs to Wikipedia indices in the KILT Wikipedia dump """
+#!/usr/bin/python3
 import argparse
 import collections
 import hashlib
 import itertools
 import json
 import os
-import typing
 
 import jsonlines
 import tqdm
@@ -14,6 +13,17 @@ from evaluation.utils import get_tokens
 
 
 def answer_in_doc(answer: str, doc: str) -> bool:
+    """Checks if an answer is in a document.
+
+    This function uses the `get_tokens()` function which is dervied from the SQuAD
+    evaluation script.
+
+    Arguments:
+        answer: ``str`` Answer.
+        doc: ``str`` Document.
+    Returns:
+        ``bool`` Whether the answer tokens are a subset of the token documents.
+    """
     answer_tokens = get_tokens(answer)
     doc_tokens = get_tokens(doc)
 
@@ -26,34 +36,39 @@ def answer_in_doc(answer: str, doc: str) -> bool:
 
 
 def create_amber_id(name: str, qid: str, pid: str) -> str:
-    """For each (name, QID, PID), we compute a unique AmbER set tuple ID"""
+    """For each (name, QID, PID) tuple, we compute a unique AmbER ID.
+
+    Arguments:
+        name: ``str`` The polysemous name for the AmbER set.
+        qid: ``str`` The ID of an entity.
+        pid: ``str`` The ID of a property.
+    Returns:
+        md5: ``str`` A MD5 has of the concatenation of the name, QID, and PID,
+            which we use as the ID of the AmbER set tuple.
+    """
     hash_input = repr([name, qid, pid]).encode()
     md5 = hashlib.md5(hash_input).hexdigest()
     return md5
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-w",
-        "--wikipedia_dump",
-        help=".json KILT Wikipedia dump for aligning entities to Wikipedia articles"
-    )
-    parser.add_argument(
-        "-c", "--collection",
-        help="Collection to collect polysemous names for, AmbER-H (human) or "
-             "AmbER-N (nonhuman)",
-        choices=["human", "nonhuman"]
-    )
-    args = parser.parse_args()
+def align_tuples_to_wikipedia(wikipedia_dump: str, collection:str) -> None:
+    """Aligns each tuple in the list of polysemous names to a Wikipedia article.
 
-    input_data_file = os.path.join(
-        "data", args.collection, "tmp/filtered_relations.jsonl"
-    )
-    output_data_file = os.path.join(
-        "data", args.collection, "amber_set_tuples.jsonl"
-    )
+    For each tuple in a set corresponding to a polysemous name, we align the tuple
+    to the corresponding Wikipedia article in a KILT Wikipedia dump. As part of this
+    alignment, we check that the value of the tuple appears in the text (first 350
+    tokens) of the document, so that when we create task-specific instances,
+    the instance is solvable. We filter tuples that aren't able to be aligned to an
+    article. The remaining tuples after this filtering are the AmbER sets tuples,
+    are written out to a JSONLines file and are used to instantiate task-specific
+    queries.
 
+    Arguments:
+        wikipedia_dump: ``str`` Path to a JSON KILT Wikipedia dump.
+        collection: ``str`` collection: ``str``The collection (human/nonhuman) of AmbER sets.
+    """
+    input_data_file = os.path.join("data", collection, "tmp/filtered_relations.jsonl")
+    output_data_file = os.path.join("data", collection, "amber_set_tuples.jsonl")
     polysemous_names = list(jsonlines.open(input_data_file))
 
     # Keep track of all entities that are in our polysemous names set
@@ -61,7 +76,7 @@ def main() -> None:
 
     # Store a mapping of QIDs that are in our set to associated Wikipedia dictionary
     qid_to_wikipedia = collections.defaultdict(list)
-    with open(args.wikipedia_dump) as reader:
+    with open(wikipedia_dump) as reader:
         for line in tqdm.tqdm(reader, desc="Loading Wikipedia articles"):
             line = json.loads(line)
             if 'wikidata_info' in line:
@@ -137,13 +152,30 @@ def main() -> None:
             for pid in d['qids'][qid]['pids']:
                 d['qids'][qid]['pids'][pid]['amber_id'] = create_amber_id(d['name'], qid, pid)
 
-    # Sort list of alias dictionaries by the alias
+    # Sort list of AmbER set tuples by the name
     filtered_names = sorted(filtered_names, key=lambda k: k["name"])
 
     # Write out the AmbER tuples with associated KILT mapping
     with open(output_data_file, "w", encoding="utf-8") as f:
         for d in filtered_names:
             f.write(json.dumps(d, ensure_ascii=False) + "\n")
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-w", "--wikipedia_dump",
+        help=".json KILT Wikipedia dump for aligning entities to Wikipedia articles"
+    )
+    parser.add_argument(
+        "-c", "--collection",
+        help="Collection to collect polysemous names for, AmbER-H (human) or "
+             "AmbER-N (nonhuman)",
+        choices=["human", "nonhuman"]
+    )
+    args = parser.parse_args()
+
+    align_tuples_to_wikipedia(args.wikipedia_dump, args.collection)
 
 
 if __name__ == "__main__":
