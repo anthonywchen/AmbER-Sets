@@ -44,7 +44,7 @@ To evaluate your retriever's predictions on AmbER sets, see the [evaluation](eva
 ```
 
 ### License
-The AmbER data is licensed under the [Creative Commons Zero v1.0 Universal License](https://creativecommons.org/publicdomain/zero/1.0/). All code provided in this respository is licensed under the [Apache License Version 2.0](https://www.apache.org/licenses/LICENSE-2.0.html).
+The AmbER sets data in the [data](data) directory is licensed under the [Creative Commons Zero v1.0 Universal License](https://creativecommons.org/publicdomain/zero/1.0/). All code provided in this respository is licensed under the [Apache License Version 2.0](https://www.apache.org/licenses/LICENSE-2.0.html).
 
 ### Contact
 For questions or comments on AmbER sets, please open a pull request or contact Anthony Chen at <anthony.chen@uci.edu>.
