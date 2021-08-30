@@ -1,80 +1,50 @@
 # AmbER Sets
+[**Data**](#Data) |
+[**Citation**](#Citation) | [**License**](#License) | [**Paper**](https://arxiv.org/abs/2106.06830) | [**Landing Page**](https://machinelearning.apple.com/research/evaluating-entity-disambiguation-amber)
 
-AmbER sets are stored in a JSONLines format under the following path: `amber_sets/<collection>/<task>/amber_sets.jsonl`
+**AmbER** (**Amb**igiuous **E**ntity **R**etrieval) sets are collections of queries which individually test a retriever's ability to do entity disambiguation.
+Each AmbER set contains queries about entities which share a name. 
+See our [**ACL-IJNLP 2021 paper**](https://arxiv.org/abs/2106.06830) to learn more about AmbER sets.
 
-Here is an example AmbER set for "Abe Lincoln" from the human collection (AmbER-H) for the question answering task: `amber_sets/human/qa/amber_sets.jsonl`
+### Environment Setup
+To install the required packages, run `pip install -r requirements.txt`
 
-<details>
-<summary>Click to expand</summary>
+Alternatively, you can use Poetry by running `poetry install` followed by `poetry shell` to activate the environment.
 
-```
-{
-    "name": "Abe Lincoln",
-    "qids": {
-        "Q91": {
-            "is_head": true,
-            "pop": 5.1942478558575464,
-            "wikipedia": [
-                {"kilt_idx": 49, "wikipedia_id": "307", "title": "Abraham Lincoln"},
-                {"kilt_idx": 3767946, "wikipedia_id": "42390831", "title": "Abraham Lincoln's Life"}
-            ],
-            "queries": [
-                {
-                    "id": "6981ec17f0438a7cc94fff740cc9bb23=f12393b7ba0631871ea7126dd5127772",
-                    "input": "Which battle did Abe Lincoln fight in?",
-                    "output": [
-                        {
-                            "answer": ["American Civil War", ...],
-                            "provenance": [
-                                {"kilt_idx": 49, "wikipedia_id": "307", "title": "Abraham Lincoln"}
-                            ],
-                            "meta": {...}
-                        }
-                    ],
-                    "meta": {...}
-                }
-            ]
-        },
-        "Q4666410": {
-            "is_head": false,
-            "pop": 1.7781512503836436,
-            "wikipedia": [
-                {"kilt_idx": 477649, "wikipedia_id": "17039796", "title": "Abe Lincoln (musician)" }
-            ],
-            "queries": [
-                {
-                    "id": "edf1ff070a3cbd5fdee738262db8e740=44a67ee4dd88179d1147102e9753a5fa",
-                    "input": "What musical instrument does Abe Lincoln play?",
-                    "output": [
-                        {
-                            "answer": ["slide trombone", "..."],
-                            "provenance": [
-                                {"kilt_idx": 477649, "wikipedia_id": "17039796", "title": "Abe Lincoln (musician)"}
-                            ],
-                            "meta": {...}
-                        }
-                    ],
-                    "meta": {...}
-                }
-            ]
-        }
-    }
+### Generating AmbER Sets
+AmbER sets are generated from Wikidata tuples and are aligned to a Wikipedia dump. 
+To see replicate our pipeline, see the [generate_amber_sets](generate_amber_sets) directory.
+This step is optional as we provide the output of this step in the next section.
+
+### Data
+The AmbER sets, which are the output of the generation pipeline is provided in the [data](data) directory.
+See this directory for more information on the data.
+
+### AmbER Sets Evaluation
+To evaluate your retriever's predictions on AmbER sets, see the [evaluation](evaluation) directory.
+
+### Citation
+```bibtex
+@inproceedings{chen-etal-2021-evaluating,
+    title = "Evaluating Entity Disambiguation and the Role of Popularity in Retrieval-Based {NLP}",
+    author = "Chen, Anthony  and
+      Gudipati, Pallavi  and
+      Longpre, Shayne  and
+      Ling, Xiao  and
+      Singh, Sameer",
+    booktitle = "Proceedings of the 59th Annual Meeting of the Association for Computational Linguistics and the 11th International Joint Conference on Natural Language Processing (Volume 1: Long Papers)",
+    month = aug,
+    year = "2021",
+    address = "Online",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2021.acl-long.345",
+    doi = "10.18653/v1/2021.acl-long.345",
+    pages = "4472--4485",
 }
 ```
-</details>
 
-## Generating AmbER Sets
-Here are details if you are interested in reproducing the AmbER sets from scratch.
-Generating AmbER sets happens in three steps:
-
-1. Downloading and processing a large Wikidata dump
-2. Extracting AmbER set tuples from this dump
-3. Generating task-specific instances (e.g. QA, fact checking) from the AmbER set tuples
-
-Follow the instructions in `process_wikidata_dump/` followed by `generate_amber_sets/`.
-
-
-## Evaluating AmbER Set Predictions
-
-## License
+### License
 The AmbER data is licensed under the [Creative Commons Zero v1.0 Universal License](https://creativecommons.org/publicdomain/zero/1.0/).
+
+### Contact
+For questions or comments on AmbER sets, please open a pull request or contact Anthony Chen at <anthony.chen@uci.edu>.

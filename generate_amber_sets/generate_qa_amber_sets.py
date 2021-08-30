@@ -1,22 +1,24 @@
-""" Generates question answering data from AmbER tuples with query templates
-
-
-"""
+#!/usr/bin/python3
 import argparse
 import hashlib
 import json
+import os
 import random
-from os.path import join
+import typing
 
 import jsonlines
 from tqdm import tqdm
 
-random.seed(0)
 
+def fill_in_template(template: str, entity_name: str) -> typing.Tuple[str, str]:
+    """Fill in an QA template with an entity name.
 
-def fill_in_template(template, entity_name):
-    """Fill in template with an entity name.
-    Also returns the hashlib of the query as a query ID.
+    Arguments:
+        template: ``str`` A question answering template.
+        entity_name: ``str`` The name of the AmbER set to fill into the template.
+    Returns:
+        query: ``str`` The template with the name slotted in.
+        query_hashlib: ``str`` A MD5 hash of the query.
     """
     query = template.replace("$entity", entity_name)
     assert entity_name in query
@@ -24,7 +26,19 @@ def fill_in_template(template, entity_name):
     return query, query_hashlib
 
 
-def generate_queries(amber_set_tuples, templates):
+def generate_qa_amber_sets(collection: str) -> None:
+    """Generates question answering instances from all AmbER set tuples.
+
+    Arguments:
+        collection: ``str``The collection (human/nonhuman) of AmbER sets.
+    """
+    input_data_file = os.path.join("data", collection, "amber_set_tuples.jsonl")
+    templates_file = os.path.join("data", collection, "qa_templates.json")
+    output_data_file = os.path.join("data", collection, "qa/amber_sets.jsonl")
+
+    amber_set_tuples = list(jsonlines.open(input_data_file))
+    templates = json.load(open(templates_file))
+
     amber_sets = []
 
     for d in tqdm(amber_set_tuples):
@@ -34,7 +48,7 @@ def generate_queries(amber_set_tuples, templates):
         for qid, qid_dict in d["qids"].items():
             amber_set["qids"][qid] = {
                 "is_head": qid_dict["is_head"],
-                "pop": qid_dict["pop"],
+                "popularity": qid_dict["popularity"],
                 "wikipedia": qid_dict["wikipedia"],
                 "queries": [],
             }
@@ -71,41 +85,36 @@ def generate_queries(amber_set_tuples, templates):
                     {
                         "id": input_id,
                         "input": query,
-                        "output": [
-                            {
-                                "answer": values + additional_values,
-                                "provenance": pid_dict[pid]["provenance"],
-                                "meta": {
-                                    "values": values,
-                                    "additional_values": additional_values,
-                                },
-                            }
-                        ],
+                        "output": {
+                            "answer": values + additional_values,
+                            "provenance": pid_dict[pid]["provenance"],
+                            "meta": {
+                                "values": values,
+                                "additional_values": additional_values,
+                            },
+                        },
                         "meta": {"pid": pid},
                     }
                 )
         amber_sets.append(amber_set)
 
-    return amber_sets
+    with open(output_data_file, "w", encoding="utf-8") as f:
+        for d in amber_sets:
+            f.write(json.dumps(d, ensure_ascii=False) + "\n")
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-c", "--collection")
+    parser.add_argument(
+        "-c",
+        "--collection",
+        help="Collection to collect polysemous names for, AmbER-H (human) or "
+        "AmbER-N (nonhuman)",
+        choices=["human", "nonhuman"],
+    )
     args = parser.parse_args()
 
-    input_data_file = join("amber_sets", args.collection, "amber_set_tuples.jsonl")
-    templates_file = join("amber_sets", args.collection, "qa_templates.json")
-    output_data_file = join("amber_sets", args.collection, "qa/amber_sets.jsonl")
-
-    amber_set_tuples = [line for line in jsonlines.open(input_data_file)]
-    templates = json.load(open(templates_file))
-
-    amber_sets = generate_queries(amber_set_tuples, templates)
-
-    with open(output_data_file, "w", encoding="utf-8") as f:
-        for d in amber_sets:
-            f.write(json.dumps(d, ensure_ascii=False) + "\n")
+    generate_qa_amber_sets(args.collection)
 
 
 if __name__ == "__main__":
