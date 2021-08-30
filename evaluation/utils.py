@@ -1,13 +1,15 @@
-""" Helper functions for computing end-to-end metrics """
+"""Helper functions for evaluation."""
 import collections
 import re
 import string
 
 
-#### Downstream Metrics
 def normalize_answer(s):
     """Lower text and remove punctuation, articles and extra whitespace.
     This function is an extended version of the SQuAD evaluation script.
+
+    Arguments:
+        s: ``str`` String to normalize.
     """
     def remove_articles(text):
         regex = re.compile(r"\b(a|an|the)\b", re.UNICODE)
@@ -37,10 +39,12 @@ def get_tokens(s):
 
 
 def em(ans, pred):
+    """Implements the exact match metric."""
     return int(normalize_answer(ans) == normalize_answer(pred))
 
 
 def f1(ans, pred):
+    """Implements the F1 metric."""
     ans_tokens = get_tokens(ans)
     pred_tokens = get_tokens(pred)
     common = collections.Counter(ans_tokens) & collections.Counter(pred_tokens)
@@ -55,7 +59,6 @@ def f1(ans, pred):
     return f1
 
 
-####
 def get_subset_scores(amber_sets, raw_metrics, head_subset: bool):
     raw_subset_metrics = collections.defaultdict(list)
 
