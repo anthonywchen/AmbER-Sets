@@ -2,19 +2,33 @@
 import argparse
 import hashlib
 import json
-from os.path import join
+import os
+import typing
 
 import jsonlines
 from tqdm import tqdm
 
 
-def create_sf_instance(entity_name, pid_name):
-    sf_input = entity_name + " [SEP] " + pid_name
+def create_sf_instance(entity_name: str, property_label: str):
+    """Creates a slot filling instance by combining a name and a relation.
+
+    Arguments:
+        entity_name: ``str`` The name of the AmbER set to fill into the template.
+        property_label: ``str`` The property name of the AmbER set tuple.
+    Returns:
+        query: ``str`` The template with the name slotted in.
+        query_hashlib: ``str`` A MD5 hash of the query.
+    """
+    sf_input = entity_name + " [SEP] " + property_label
     sf_hashlib = hashlib.md5(sf_input.encode("utf-8")).hexdigest()
     return sf_input, sf_hashlib
 
 
-def generate_slot_filling_dataset(amber_set_tuples):
+def generate_sf_amber_sets(collection: str) -> None:
+    input_data_file = os.path.join("data", collection, "amber_set_tuples.jsonl")
+    output_data_file = os.path.join("data", collection, "sf/amber_sets.jsonl")
+    amber_set_tuples = list(jsonlines.open(input_data_file))
+
     amber_sets = []
 
     for d in tqdm(amber_set_tuples):
@@ -59,7 +73,9 @@ def generate_slot_filling_dataset(amber_set_tuples):
                 )
         amber_sets.append(amber_set)
 
-    return amber_sets
+    with open(output_data_file, "w", encoding="utf-8") as f:
+        for d in amber_sets:
+            f.write(json.dumps(d, ensure_ascii=False) + "\n")
 
 
 def main():
@@ -72,14 +88,7 @@ def main():
     )
     args = parser.parse_args()
 
-    input_data_file = join("data", args.collection, "amber_set_tuples.jsonl")
-    output_data_file = join("data", args.collection, "sf/amber_sets.jsonl")
-    amber_set_tuples = list(jsonlines.open(input_data_file))
-    amber_sets = generate_slot_filling_dataset(amber_set_tuples)
-
-    with open(output_data_file, "w", encoding="utf-8") as f:
-        for d in amber_sets:
-            f.write(json.dumps(d, ensure_ascii=False) + "\n")
+    generate_sf_amber_sets(args.collection)
 
 
 if __name__ == "__main__":
