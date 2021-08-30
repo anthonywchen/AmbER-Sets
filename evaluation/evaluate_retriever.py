@@ -163,7 +163,6 @@ def evaluate_retriever(
     # `consistency` is the % of AmbER sets where all queries in the set were retrieved
     metrics['consistency'] = consistency_at_k(amber_sets, raw_metrics)
 
-
     if metrics_dir:
         metrics_file = os.path.join(metrics_dir, f'metrics@{k}.json')
         with open(metrics_file, 'w') as f:
