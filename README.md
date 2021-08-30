@@ -9,7 +9,7 @@ See our [**ACL-IJNLP 2021 paper**](https://arxiv.org/abs/2106.06830) to learn mo
 ### Environment Setup
 To install the required packages, run `pip install -r requirements.txt`
 
-Alternatively, you can use Poetry by running `poetry install` followed by `poetry shell` to activate the poetry environment.
+Alternatively, you can use Poetry by running `poetry install` followed by `poetry shell` to activate the environment.
 
 ### Generating AmbER Sets
 AmbER sets are generated from Wikidata tuples and are aligned to a Wikipedia dump. 
