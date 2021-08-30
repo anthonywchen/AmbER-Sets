@@ -27,6 +27,11 @@ def fill_in_template(template: str, entity_name: str) -> typing.Tuple[str, str]:
 
 
 def generate_qa_amber_sets(collection: str) -> None:
+    """Generates question answering instances from all AmbER set tuples.
+
+    Arguments:
+        collection: ``str``The collection (human/nonhuman) of AmbER sets.
+    """
     input_data_file = os.path.join("data", collection, "amber_set_tuples.jsonl")
     templates_file = os.path.join("data", collection, "qa_templates.json")
     output_data_file = os.path.join("data", collection, "qa/amber_sets.jsonl")

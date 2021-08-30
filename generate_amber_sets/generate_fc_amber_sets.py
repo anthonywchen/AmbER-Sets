@@ -87,6 +87,11 @@ def generate_false_instance(
 
 
 def generate_fc_amber_sets(collection: str) -> None:
+    """Generates fact checking instances from all AmbER set tuples.
+
+    Arguments:
+        collection: ``str``The collection (human/nonhuman) of AmbER sets.
+    """
     input_data_file = os.path.join("data", collection, "amber_set_tuples.jsonl")
     templates_file = os.path.join("data", collection, "fc_templates.json")
     output_data_file = os.path.join("data", collection, "fc/amber_sets.jsonl")

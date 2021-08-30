@@ -25,6 +25,11 @@ def create_sf_instance(entity_name: str, property_label: str) -> typing.Tuple[st
 
 
 def generate_sf_amber_sets(collection: str) -> None:
+    """Generates slot filling instances from all AmbER set tuples.
+
+    Arguments:
+        collection: ``str``The collection (human/nonhuman) of AmbER sets.
+    """
     input_data_file = os.path.join("data", collection, "amber_set_tuples.jsonl")
     output_data_file = os.path.join("data", collection, "sf/amber_sets.jsonl")
     amber_set_tuples = list(jsonlines.open(input_data_file))
