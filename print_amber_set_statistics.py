@@ -54,20 +54,21 @@ def print_instances_statistics(instances_file, task):
     print("Number of", task, "instances:", num_instances)
 
 
-def print_statistics(amber_subset):
-    print("\nAmbER-" + amber_subset[0].upper(), "\n-------")
-    tuples_file = join("data", amber_subset, "amber_set_tuples.jsonl")
-    pids_file = join("data", amber_subset, "entity_types_to_distinguishing_properties .json")
+def print_statistics(collection):
+    print("\nAmbER-" + collection[0].upper(), "\n-------")
+    tuples_file = join("data", collection, "amber_set_tuples.jsonl")
+    pids_file = join("data", collection, "entity_types_to_distinguishing_properties.json")
     print_tuples_statistics(tuples_file, pids_file)
 
-    fc_file = join("data", amber_subset, "fc/amber_sets.jsonl")
-    print_instances_statistics(fc_file, "FC")
-    sf_file = join("data", amber_subset, "sf/amber_sets.jsonl")
-    print_instances_statistics(sf_file, "SF")
-    qa_file = join("data", amber_subset, "qa/amber_sets.jsonl")
-    print_instances_statistics(qa_file, "QA")
+    print_instances_statistics(join("data", collection, "fc/amber_sets.jsonl"), "FC")
+    print_instances_statistics(join("data", collection, "sf/amber_sets.jsonl"), "SF")
+    print_instances_statistics(join("data", collection, "qa/amber_sets.jsonl"), "QA")
+
+
+def main():
+    print_statistics("human")
+    print_statistics("nonhuman")
 
 
 if __name__ == "__main__":
-    print_statistics("human")
-    print_statistics("nonhuman")
+    main()
