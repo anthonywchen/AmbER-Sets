@@ -3,6 +3,7 @@ import argparse
 import collections
 import json
 import os
+import statistics
 import typing
 
 import jsonlines
@@ -70,11 +71,11 @@ def get_raw_metrics(
     """Computes accuracy scores at a per-query level.
 
     Arguments:
-        amber_sets: ``list``
-        predictions: ``dict``
-        k: ``int``
+        amber_sets: ``list`` List of AmbER sets.
+        predictions: ``dict`` Dictionary of per-query predictions.
+        k: ``int`` Top retrieved pages to compute accuracy over.
     Returns:
-        raw_metrics: ``dict``
+        raw_metrics: ``dict`` Mapping from query ID to a score for that query.
     """
     raw_metrics = collections.defaultdict(dict)
 
@@ -123,7 +124,7 @@ def consistency_at_k(
         consistency_scores.append(is_consistent)
 
     # Average consistency across AmbER sets
-    consistency = 100*sum(consistency_scores)/len(consistency_scores)
+    consistency = 100*statistics.mean(consistency_scores)
     return consistency
 
 
@@ -153,17 +154,15 @@ def evaluate_retriever(
     raw_metrics = get_raw_metrics(amber_sets, predictions, k)
 
     # `metrics` aggregates the raw metrics into average scores
-    metrics = {
-        metric: 100*sum(raw_metrics[metric].values())/len(raw_metrics[metric].values())
-        for metric in raw_metrics
-    }
+    metrics = {m: 100*statistics.mean(raw_metrics[m].values()) for m in raw_metrics}
+
+    # For the scores in `metrics`, we split them based on head/tail entities
+    metrics['head'] = get_subset_scores(amber_sets, raw_metrics, True)
+    metrics['tail'] = get_subset_scores(amber_sets, raw_metrics, False)
 
     # `consistency` is the % of AmbER sets where all queries in the set were retrieved
     metrics['consistency'] = consistency_at_k(amber_sets, raw_metrics)
 
-    # For all scores in `metrics`, we split them based on head/tail entities
-    metrics['head'] = get_subset_scores(amber_sets, raw_metrics, True)
-    metrics['tail'] = get_subset_scores(amber_sets, raw_metrics, False)
 
     if metrics_dir:
         metrics_file = os.path.join(metrics_dir, f'metrics@{k}.json')
