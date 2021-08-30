@@ -51,7 +51,7 @@ def create_amber_id(name: str, qid: str, pid: str) -> str:
     return md5
 
 
-def align_tuples_to_wikipedia(wikipedia_dump: str, collection:str) -> None:
+def align_tuples_to_wikipedia(wikipedia_dump: str, collection: str) -> None:
     """Aligns each tuple in the list of polysemous names to a Wikipedia article.
 
     For each tuple in a set corresponding to a polysemous name, we align the tuple
@@ -65,7 +65,7 @@ def align_tuples_to_wikipedia(wikipedia_dump: str, collection:str) -> None:
 
     Arguments:
         wikipedia_dump: ``str`` Path to a JSON KILT Wikipedia dump.
-        collection: ``str`` collection: ``str``The collection (human/nonhuman) of AmbER sets.
+        collection: ``str`` The collection (human/nonhuman) of AmbER sets.
     """
     input_data_file = os.path.join("data", collection, "tmp/filtered_relations.jsonl")
     output_data_file = os.path.join("data", collection, "amber_set_tuples.jsonl")
@@ -86,7 +86,7 @@ def align_tuples_to_wikipedia(wikipedia_dump: str, collection:str) -> None:
 
     # Add Wikipedia information to each entity in the tuples and filter
     # unanswerable relations
-    for d in tqdm.tqdm(polysemous_names, desc="Aligning entities to Wikipedia articles"):
+    for d in tqdm.tqdm(polysemous_names, desc="Aligning entities to Wikipedia"):
         for qid in list(d['qids']):
             # Grabs all Wikipedia articles for the current QID
             d['qids'][qid]['wikipedia'] = []

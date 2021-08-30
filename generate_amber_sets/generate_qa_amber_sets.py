@@ -10,7 +10,7 @@ import jsonlines
 from tqdm import tqdm
 
 
-def fill_in_template(template: str, entity_name: str):
+def fill_in_template(template: str, entity_name: str) -> typing.Tuple[str, str]:
     """Fill in an QA template with an entity name.
 
     Arguments:
@@ -33,7 +33,6 @@ def generate_qa_amber_sets(collection: str) -> None:
 
     amber_set_tuples = list(jsonlines.open(input_data_file))
     templates = json.load(open(templates_file))
-
 
     amber_sets = []
 

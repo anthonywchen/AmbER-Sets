@@ -22,8 +22,9 @@ def filter_relations(collection: str) -> None:
         collection: ``str``The collection (human/nonhuman) of AmbER sets.
     """
     input_data_file = os.path.join("data", collection, "tmp/polysemous_names.jsonl")
-    entity_types_to_distinguishing_properties_file = \
-        os.path.join("data", collection, "entity_types_to_distinguishing_properties.json")
+    entity_types_to_distinguishing_properties_file = os.path.join(
+        "data", collection, "entity_types_to_distinguishing_properties.json"
+    )
     output_data_file = os.path.join("data", collection, "tmp/filtered_relations.jsonl")
     polysemous_names = list(jsonlines.open(input_data_file))
     entity_types_to_distinguishing_properties = json.load(open(

@@ -9,7 +9,7 @@ import jsonlines
 from tqdm import tqdm
 
 
-def create_sf_instance(entity_name: str, property_label: str):
+def create_sf_instance(entity_name: str, property_label: str) -> typing.Tuple[str, str]:
     """Creates a slot filling instance by combining a name and a relation.
 
     Arguments:

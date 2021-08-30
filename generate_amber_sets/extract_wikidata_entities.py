@@ -109,7 +109,7 @@ def extract_wikipedia_page(line: dict) -> str:
     return None
 
 
-def extract_relations(line: dict) -> typing.Dict[str, typing.Dict]:
+def extract_relations(line: dict) -> typing.Dict[str, dict]:
     """Extracts all relations for each entity line.
 
     Extracts all relations for the current entity where the value of the entity is

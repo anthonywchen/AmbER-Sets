@@ -11,7 +11,7 @@ import tqdm
 engine = inflect.engine()
 
 
-def extract_aliases_for_entity(entities: dict, qid: str) -> typing.Tuple:
+def extract_aliases_for_entity(entities: dict, qid: str) -> typing.Tuple[list, list]:
     """Extracts aliases for a Wikidata entity.
 
     A helper function for completing the entity dictionaries. For the argument QID
@@ -48,7 +48,7 @@ def extract_aliases_for_entity(entities: dict, qid: str) -> typing.Tuple:
     return aliases, list(sorted(additional_aliases))
 
 
-def extract_aliases_for_quantity(amount: str) -> typing.Tuple:
+def extract_aliases_for_quantity(amount: str) -> typing.Tuple[list, list]:
     """Extracts aliases for a numerical value.
 
     A helper function for completing the entity dictionaries. For the quantity,

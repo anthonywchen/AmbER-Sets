@@ -13,15 +13,15 @@ from tqdm import tqdm
 random.seed(0)
 
 
-def fill_template(template: str, entity: str, object: str):
+def fill_template(template: str, entity: str, object: str) -> typing.Tuple[str, str]:
     """Fill in an FC template with an entity name and the value.
 
     Arguments:
         template: ``str`` A fact checking template.
-        entity_name: ``str`` The name of the AmbER set to fill into the template.
+        entity: ``str`` The name of the AmbER set to fill into the template.
         object: ``str`` The value of the AmbER set tuple.
     Returns:
-        query: ``str`` The template with the name slotted in.
+        query: ``str`` The template with the name and object slotted in.
         query_hashlib: ``str`` A MD5 hash of the query.
     """
     query = template.replace("$entity", entity).replace("$object", object)
@@ -30,7 +30,25 @@ def fill_template(template: str, entity: str, object: str):
     return query, query_hashlib
 
 
-def generate_true_instance(template, entity_name, pid_dict):
+def generate_true_instance(
+    template: str,
+    entity_name: str,
+    pid_dict: typing.Dict[str, dict]
+) -> typing.Tuple[str, str]:
+    """Creates a true fact checking query.
+
+    Creates a true fact checking query by taking the entity name of an AmbER set and
+    the value of an AmbER set tuple and filling in an fact checking template. We
+    check that the value we use to generate the query was found in the gold document.
+
+    Arguments:
+        template: ``str`` A fact checking template.
+        entity_name: ``str`` The name of the AmbER set to fill into the template.
+        pid_dict: ``dict`` A relation dictionary of a AmbER set tuple.
+    Returns:
+        query: ``str`` A true fact checking query.
+        query_hashlib: ``str`` A MD5 hash of the query.
+    """
     for value in pid_dict['values']:
         if value['found_in_passage']:
             answer = value["aliases"][0]
@@ -39,7 +57,28 @@ def generate_true_instance(template, entity_name, pid_dict):
     return query, query_hashlib
 
 
-def generate_false_instance(template, entity_name, pid_dict, other_answers):
+def generate_false_instance(
+    template: str,
+    entity_name: str,
+    pid_dict: typing.Dict[str, dict],
+    other_answers: typing.List[str]
+) -> typing.Tuple[str, str]:
+    """Creates a false fact checking query.
+
+    Creates a false fact checking query by taking the entity name of an AmbER set and
+    a false value. For example, for the entity Michael Jordan and the relation sport,
+    a false value might be soccer. We then use these to fill in a fact checking
+    template.
+
+    Arguments:
+        template: ``str`` A fact checking template.
+        entity_name: ``str`` The name of the AmbER set to fill into the template.
+        pid_dict: ``dict`` A relation dictionary of a AmbER set tuple.
+        other_answers: ``list`` A list of values that have appeared for the relation.
+    Returns:
+        query: ``str`` A false fact checking query.
+        query_hashlib: ``str`` A MD5 hash of the query.
+    """
     answers = [value['aliases'][0] for value in pid_dict["values"]]
     for wrong_answer in other_answers:
         if wrong_answer not in answers:
@@ -64,11 +103,11 @@ def generate_fc_amber_sets(collection: str) -> None:
                     answer = value["aliases"][0]
                     popular_pid_values[pid][answer] += 1
 
-    # For each PID, keep around the 50 most popular answers
+    # For each PID, keep all values sorted by popularity
     for pid in popular_pid_values:
         popular_pid_values[pid] = sorted(
             popular_pid_values[pid], key=popular_pid_values[pid].get, reverse=True
-        )[:50]
+        )
 
     amber_sets = []
 
@@ -158,7 +197,6 @@ def main():
     args = parser.parse_args()
 
     generate_fc_amber_sets(args.collection)
-
 
 
 if __name__ == "__main__":
