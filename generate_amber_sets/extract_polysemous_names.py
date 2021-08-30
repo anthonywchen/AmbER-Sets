@@ -5,8 +5,8 @@ import os
 import typing
 
 import inflect
-import ujson as json
 import tqdm
+import ujson as json
 
 engine = inflect.engine()
 
@@ -18,7 +18,7 @@ def extract_aliases_for_entity(entities: dict, qid: str) -> typing.Tuple[list, l
     (entity), we extract the aliases as provided by Wikidata as well as extract a list
     of expanded aliases. These additional aliases are found by taking entities of
     those that "perform" or "do" the entity. For example, if the QID is
-    Q6607 (guitar), the additional aliases will contain "guitarist". This was done 
+    Q6607 (guitar), the additional aliases will contain "guitarist". This was done
     for end tasks (e.g. reading comprehension),  where for the question "What
     instrument does XXX play?" a model may answer "guitarist", which we deem correct.
     Of course, doing this makes the answer set nosier, but in our qualitative
@@ -39,8 +39,9 @@ def extract_aliases_for_entity(entities: dict, qid: str) -> typing.Tuple[list, l
 
         # Add in aliases for the people who participate in the answer
         # e.g. for the alias guitar, we also add in guitarist
-        for value in entities[qid]['pids'].get("P3095", {}).get("values", []) + \
-                     entities[qid]['pids'].get("P1535", {}).get("values", []):
+        for value in \
+                entities[qid]['pids'].get("P3095", {}).get("values", []) + \
+                entities[qid]['pids'].get("P1535", {}).get("values", []):
             pqid = value["qid"]  # pqid = participant QID
             if pqid in entities:
                 additional_aliases.update(entities[pqid]['aliases'])
@@ -150,7 +151,8 @@ def extract_polysemous_names(entity_file: str, collection: str) -> None:
             polysemous_names[name][qid]['is_head'] = pop == max(pops)
 
     # Delete entities where they have an entity type that doesn't match our collection
-    acceptable_entity_types = list(json.load(open(entity_types_to_distinguishing_properties_file)))
+    acceptable_entity_types = \
+        list(json.load(open(entity_types_to_distinguishing_properties_file)))
     for qid in tqdm.tqdm(list(entities), desc="Deleting entities w/o matching types"):
         entity_types = set(entities[qid].get('entity_types', []))
         if len(entity_types.intersection(acceptable_entity_types)) == 0:

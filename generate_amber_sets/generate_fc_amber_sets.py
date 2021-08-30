@@ -191,6 +191,7 @@ def generate_fc_amber_sets(collection: str) -> None:
         for d in amber_sets:
             f.write(json.dumps(d, ensure_ascii=False) + "\n")
 
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(

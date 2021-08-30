@@ -89,7 +89,8 @@ def get_raw_metrics(
 
                 gold_pages = query_dict['output']['provenance']
                 retr_pages = predictions[query_id]['output']['provenance']
-                raw_metrics['accuracy'][query_id] = accuracy_at_k(gold_pages, retr_pages, k)
+                raw_metrics['accuracy'][query_id] = \
+                    accuracy_at_k(gold_pages, retr_pages, k)
 
     return raw_metrics
 
@@ -148,7 +149,7 @@ def evaluate_retriever(
         metrics_dir: ``str`` (Optional) Directory to write metric scores.
     """
     amber_sets = list(jsonlines.open(annotations_file))
-    predictions = {l['id']: l for l in jsonlines.open(predictions_file)}
+    predictions = {d['id']: d for d in jsonlines.open(predictions_file)}
 
     # `raw_metrics` are the individual scores for each query
     raw_metrics = get_raw_metrics(amber_sets, predictions, k)

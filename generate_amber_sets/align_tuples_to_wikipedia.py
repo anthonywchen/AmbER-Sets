@@ -119,8 +119,11 @@ def align_tuples_to_wikipedia(wikipedia_dump: str, collection: str) -> None:
                                     'wikipedia_id': article['wikipedia_id'],
                                     'title': article['wikipedia_title']
                                 }
-                                if provenance_dict not in d['qids'][qid]['pids'][pid]['provenance']:
-                                    d['qids'][qid]['pids'][pid]['provenance'].append(provenance_dict)
+                                if provenance_dict not in \
+                                        d['qids'][qid]['pids'][pid]['provenance']:
+                                    d['qids'][qid]['pids'][pid]['provenance'].append(
+                                        provenance_dict
+                                    )
                                 found_in_passage = True
                     value['found_in_passage'] = found_in_passage
 
@@ -150,7 +153,8 @@ def align_tuples_to_wikipedia(wikipedia_dump: str, collection: str) -> None:
     for d in filtered_names:
         for qid in d['qids']:
             for pid in d['qids'][qid]['pids']:
-                d['qids'][qid]['pids'][pid]['amber_id'] = create_amber_id(d['name'], qid, pid)
+                d['qids'][qid]['pids'][pid]['amber_id'] = \
+                    create_amber_id(d['name'], qid, pid)
 
     # Sort list of AmbER set tuples by the name
     filtered_names = sorted(filtered_names, key=lambda k: k["name"])

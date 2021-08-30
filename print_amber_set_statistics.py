@@ -57,7 +57,9 @@ def print_instances_statistics(instances_file, task):
 def print_statistics(collection):
     print("\nAmbER-" + collection[0].upper(), "\n-------")
     tuples_file = join("data", collection, "amber_set_tuples.jsonl")
-    pids_file = join("data", collection, "entity_types_to_distinguishing_properties.json")
+    pids_file = join(
+        "data", collection, "entity_types_to_distinguishing_properties.json"
+    )
     print_tuples_statistics(tuples_file, pids_file)
 
     print_instances_statistics(join("data", collection, "fc/amber_sets.jsonl"), "FC")

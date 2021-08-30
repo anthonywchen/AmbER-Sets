@@ -142,7 +142,7 @@ def extract_relations(line: dict) -> typing.Dict[str, dict]:
                         "amount": entry['mainsnak']["datavalue"]["value"]["amount"],
                         "unit": entry['mainsnak']["datavalue"]["value"]["unit"]
                     })
-                else: # Skip answers that are strings, GPS location, etc.
+                else:  # Skip answers that are strings, GPS location, etc.
                     continue
 
     return relations
