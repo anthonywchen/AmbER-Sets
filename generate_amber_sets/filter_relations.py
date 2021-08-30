@@ -1,9 +1,4 @@
-""" Filters relations.
-
-1. Remove PIDs that aren't in a list of "good PIDs" or that are shared across entities.
-2. Remove aliases that don't have at least 2 entities with relations or head entity
-doesn't have relations.
-"""
+#!/usr/bin/python3
 import argparse
 import collections
 import itertools
@@ -14,20 +9,22 @@ import jsonlines
 import tqdm
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-c", "--collection",
-        help="Collection to collect polysemous names for, AmbER-H (human) or "
-             "AmbER-N (nonhuman)",
-        choices=["human", "nonhuman"]
-    )
-    args = parser.parse_args()
+def filter_relations(collection: str) -> None:
+    """Filters relations from entities group by polysemous names.
 
-    input_data_file = os.path.join("data", args.collection, "tmp/polysemous_names.jsonl")
+    For each entity in a set corresponding to a polysemous name, we filter relations
+    if the relation ID (PID) is NOT in a list of distinguishing PIDs for the
+    entities' entity type or if the relation is share by multiple entiites in the set.
+    The list of polysemous names with entities with filtered relations is written out
+    into a JSONLines file.
+
+    Arguments:
+        collection: ``str``The collection (human/nonhuman) of AmbER sets.
+    """
+    input_data_file = os.path.join("data", collection, "tmp/polysemous_names.jsonl")
     entity_types_to_distinguishing_properties_file = \
-        os.path.join("data", args.collection, "entity_types_to_distinguishing_properties.json")
-    output_data_file = os.path.join("data", args.collection, "tmp/filtered_relations.jsonl")
+        os.path.join("data", collection, "entity_types_to_distinguishing_properties.json")
+    output_data_file = os.path.join("data", collection, "tmp/filtered_relations.jsonl")
     polysemous_names = list(jsonlines.open(input_data_file))
     entity_types_to_distinguishing_properties = json.load(open(
         entity_types_to_distinguishing_properties_file
@@ -61,6 +58,19 @@ def main() -> None:
     with open(output_data_file, "w", encoding="utf-8") as f:
         for d in polysemous_names:
             f.write(json.dumps(d, ensure_ascii=False) + "\n")
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-c", "--collection",
+        help="Collection to collect polysemous names for, AmbER-H (human) or "
+             "AmbER-N (nonhuman)",
+        choices=["human", "nonhuman"]
+    )
+    args = parser.parse_args()
+
+    filter_relations(args.collection)
 
 
 if __name__ == "__main__":
