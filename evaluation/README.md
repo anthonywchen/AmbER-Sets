@@ -1,6 +1,11 @@
 # Evaluation
 
 ### Evaluate Retrieval System
+We have created our own evaluation script given your retriever's predictions on the KILT Wikipedia dump. 
+To handle how different retrievers create passages out of documents (TF-IDF does not create passages while DPR does), our evaluation script computes document-level metrics.
+ That is, if your retriever has retrieved multiple passages from the same document, the script will take the highest scoring passage as the rank of the document. 
+
+
 To evaluate your retrieval system, run:
 ```bash
 PYTHONPATH=. python evaluation/evaluate_retriever.py 
@@ -16,4 +21,4 @@ The evaluation script expects a prediction file in a JSONLines format where each
 ```
 
 * `id`: The ID of the query in the annotations file the line corresponds to.
-* `provenance`: A list of retrieved documents sorted from highest scoring to lowest scoring. This field must be under the `output` key.
+* `provenance`: A list of retrieved documents sorted from highest scoring to lowest scoring. This field must be under the `output` key. The `wikipedia_id` values correspond to the IDs in the KILT Wikipedia dump. The length of the `provenance` list can be larger than `k` as the script will take the first `k` elements before doing the evaluation.
