@@ -1,20 +1,4 @@
-"""Extracts Wikidata entity information from various dumps and outputs to a
-single JSON file, while filtering entities that do not match certain criteria.
-The JSON file is broken down into a line for each entity
-for easy reading. Each line has the following format:
-
-entity_id: {
-    "label": ``str`` Name of entity,
-    "aliases": ``str`` Alternative names of entities,
-    "entity_types: ``List[str]`` List of entity types,
-    "wikipedia_page": ``str`` Wikipedia page of entity,
-    "popularity": ``int`` Number of page views for Wikipedia page,
-    "relations": ``dict`` {
-        property_id1: [<list of tail entity IDs],
-        property_id2: [<list of tail entity IDs],
-    }
-}
-"""
+#!/usr/bin/python3
 import argparse
 import bz2
 import collections
@@ -26,17 +10,26 @@ import ujson as json
 
 
 def dumb_filter(line: str) -> bool:
-    """Does a simple check on a Wikidata line that is a dictionary in string format.
-    The reason is that json.loads() is slow, and if we can do some filtering
+    """Filters a Wikidata line that is a dictionary in string format.
+
+    Applies a simple check that tests if the currenty entity line has a English
+    Wikipedia article before loading. The reason is that loading a JSON object is slow
     before running it, that speeds up code. Removing this function call should not
-    change the output file.
+    change the resulting file.
+
+    Arguments:
+        line: ``str`` A line in the Wikidata dump.
+    Returns:
+        ``bool`` Whether the current line is for an entity with an English article
     """
     return "\"enwiki\"" not in line and "\"type\":\"item\"" in line
 
 
 def extract_popularities(popularity_dump: str) -> typing.Dict[str, float]:
-    """Iterate through the Wikipedia popularity dump without decompressing
-    it, storing each English Wikipedia page's number of page views.
+    """Extract each entity's popularity.
+
+    Iterate through the Wikipedia popularity dump (without decompressing)
+    it, storing each English Wikipedia page's (log) number of page views.
 
     Arguments:
         popularity_dump: ``str`` A path to a .BZ2 file containing Wikipedia
@@ -59,14 +52,25 @@ def extract_popularities(popularity_dump: str) -> typing.Dict[str, float]:
 
 
 def extract_label(line: dict) -> str:
-    """Extracts the English label (canonical name) for an entity"""
+    """Extracts the English label (canonical name) for an entity.
+    Arguments:
+        line: ``dict`` A line in the Wikidata dump.
+    Returns:
+        ``str`` Canonical English name for the entity.
+    """
     if 'en' in line['labels']:
         return line['labels']['en']['value']
     return None
 
 
 def extract_aliases(line: dict) -> typing.List[str]:
-    """Extracts all English names for an entity"""
+    """Extracts all English names for an entity.
+
+    Arguments:
+        line: ``dict`` A line in the Wikidata dump.
+    Returns:
+        aliases: ``list`` All English aliases for the entity.
+    """
     label = extract_label(line)
     aliases = [label] if label else []
     if 'en' in line['aliases']:
@@ -75,7 +79,14 @@ def extract_aliases(line: dict) -> typing.List[str]:
 
 
 def extract_entity_types(line: dict) -> typing.List[str]:
-    """Extracts the entity type for an entity"""
+    """Extracts the entity type(s) for an entity.
+
+    Arguments:
+        line: ``dict`` A line in the Wikidata dump.
+    Returns:
+        entity_types: ``list`` A list of entity types for the entity.
+            Entity types are also QIDs in Wikidata.
+    """
     entity_types = []
     # P31 is "instance of". We define these to represent entity types.
     for entry in line['claims'].get('P31', []):
@@ -86,15 +97,29 @@ def extract_entity_types(line: dict) -> typing.List[str]:
 
 
 def extract_wikipedia_page(line: dict) -> str:
-    """Extracts the Wikipedia page for an entity"""
+    """Extracts the Wikipedia page for an entity
+
+    Arguments:
+        line: ``dict`` A line in the Wikidata dump.
+    Returns:
+        ``str`` Title of the of the Wikipedia article for the entity
+    """
     if 'sitelinks' in line and 'enwiki' in line['sitelinks']:
         return line['sitelinks']['enwiki']['title'].strip().replace(" ", "_")
     return None
 
 
 def extract_relations(line: dict) -> typing.Dict[str, typing.Dict]:
-    """Extracts all relations for each entity line where the value of the relation
-    is either an entity or a quantity.
+    """Extracts all relations for each entity line.
+
+    Extracts all relations for the current entity where the value of the entity is
+    either another entity or a quantity. This excludes relations where the value is
+    something like a date (e.g. birthdate), etc.
+
+    Arguments:
+        line: ``dict`` A line in the Wikidata dump.
+    Returns:
+        relations: ``dict`` Maps from relation IDs (PIDs) to the value of the relation.
     """
     relations = collections.defaultdict(lambda: collections.defaultdict(list))
 
@@ -123,40 +148,32 @@ def extract_relations(line: dict) -> typing.Dict[str, typing.Dict]:
     return relations
 
 
-def main() -> None:
-    """For each Wikidata entity in the Wikidata dump, we extract out it's entity
-    type, associated Wikipedia page (used for popularity), all aliases
-    for the entity, and popularity of the entity's Wikipedia page, then write
-    this information into a JSON file. We write each dictionary of entity
-    information in it's own line for easy readability.
-    """
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-w",
-        "--wikidata_dump",
-        help=".json.bz2 Wikidata dump for information extraction"
-    )
-    parser.add_argument(
-        "-p",
-        "--popularity_dump",
-        help=".bz2 Wikipedia popularity dump"
-    )
-    parser.add_argument(
-        "-o",
-        "--output_file",
-        help="Output JSON file for writing Wikidata entity information"
-    )
-    args = parser.parse_args()
+def extract_wikidata_entities(
+    wikidata_dump: str,
+    popularity_dump: str,
+    output_file: str
+) -> None:
+    """Extracts Wikidata entity information from various dumps.
 
+    For each Wikidata entity in the Wikidata dump, we extract out it's entity
+    type, all aliases for the entity, Wikipedia page, and popularity of the entity's
+    Wikipedia page, then write this information into a JSON file. We write each
+    dictionary of entity information in it's own line for easy readability.
+
+    Arguments:
+        wikidata_dump: ``str`` Path to a BZ2 compressed JSON Wikidata dump.
+        popularity_dump: ``str`` Path to a BZ2 compressed JSON Wikipedia pageview dump.
+        output_file: ``str`` Path to the output BZ2 file.
+    """
     # Store each English Wikipedia page's number of page views
-    wiki_popularity = extract_popularities(args.popularity_dump)
+    wiki_popularity = extract_popularities(popularity_dump)
 
     # Iterate through the Wikidata dump without decompressing it
-    writer = open(args.output_file, "w", encoding="utf-8")
+    writer = open(output_file, "w", encoding="utf-8")
     writer.write("{\n")
     first_line_written = False
 
-    with bz2.open(args.wikidata_dump, "rt") as reader:
+    with bz2.open(wikidata_dump, "rt") as reader:
         # Each line corresponds to a dictionary about a Wikidata entity
         for line in tqdm.tqdm(reader, desc="Processing Wikidata"):
             if dumb_filter(line) or line.strip() in ["[", "]"]:
@@ -196,6 +213,29 @@ def main() -> None:
 
     writer.write("\n}")
     writer.close()
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-w", "--wikidata_dump",
+        help=".json.bz2 Wikidata dump for information extraction"
+    )
+    parser.add_argument(
+        "-p", "--popularity_dump",
+        help=".bz2 Wikipedia popularity dump"
+    )
+    parser.add_argument(
+        "-o", "--output_file",
+        help="Output JSON file for writing Wikidata entity information"
+    )
+    args = parser.parse_args()
+
+    extract_wikidata_entities(
+        args.wikidata_dump,
+        args.popularity_dump,
+        args.output_file
+    )
 
 
 if __name__ == "__main__":
