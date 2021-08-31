@@ -1,5 +1,5 @@
 # AmbER Sets
-AmbER sets for AmbER-*H* and AmbER-*N* are stored under the `human/` and `nonhuman` directories respectively. 
+AmbER sets for AmbER-*H* and AmbER-*N* are stored under the `human/` and `nonhuman/` directories respectively. 
 
 ### Files
 Each collection directory has the following files:
