@@ -13,12 +13,8 @@ Alternatively, you can use Poetry by running `poetry install` followed by `poetr
 
 ### Generating AmbER Sets
 AmbER sets are generated from Wikidata tuples and are aligned to a Wikipedia dump. 
-To see replicate our pipeline, see the [generate_amber_sets](generate_amber_sets) directory.
-This step is optional as we provide the output of this step in the next section.
-
-### Data
-The AmbER sets, which are the output of the generation pipeline is provided in the [data](data) directory.
-See this directory for more information on the data.
+To see reproduce our pipeline, see the [generate_amber_sets](generate_amber_sets) directory.
+This step is optional as the generated AmbER sets are provided in the [data](data) directory.
 
 ### AmbER Sets Evaluation
 To evaluate your retriever's predictions on AmbER sets, see the [evaluation](evaluation) directory.
