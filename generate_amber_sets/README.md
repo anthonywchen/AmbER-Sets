@@ -4,7 +4,7 @@ AmbER sets are built by first collecting relevant Wikdata tuples (known as AmbER
 Our AmbER set instances are aligned to the [KILT Wikipedia dump](https://github.com/facebookresearch/KILT) which we use as the knowledge source.
 This pipeline requires considerable disk space and memory.
 
-**Note**: Running the files in this directory is optional, as we provide the final output of these scripts in `amber_sets/`. 
+**Note**: Running the files in this directory is optional, as we provide the final output of these scripts in `data/`. 
 
 ### Download Wikidata and Wikipedia dumps
 Download the following three files:
