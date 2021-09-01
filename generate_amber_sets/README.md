@@ -25,7 +25,7 @@ For the subsequent commands, we will assume that these files are in the `dumps/`
 The first step is to collect the Wikidata tuples that become AmbER set tuples. 
 For some of the following commands, you will have to provide a flag, `--collection`, which can either be `human` or `nonhuman` corresponding to the AmbER-H and Amber-N collection of AmbER sets respectively.
 
-1. Processing the Wikidata dump and extracting entities and relevant information.
+1. Processing the Wikidata dump and extracting entities and relevant information. This takes ~8 hours to run.
 
     ```bash
     python generate_amber_sets/extract_wikidata_entities.py \
