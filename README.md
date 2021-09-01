@@ -11,7 +11,7 @@ To install the required packages, run `pip install -r requirements.txt`
 
 Alternatively, you can use Poetry by running `poetry install` followed by `poetry shell` to activate the environment.
 
-### Generating AmbER Sets
+### AmbER Sets Data
 AmbER sets are generated from Wikidata tuples and are aligned to a Wikipedia dump. 
 To see reproduce our pipeline, see the [generate_amber_sets](generate_amber_sets) directory.
 This step is optional as the generated AmbER sets are provided in the [data](data) directory.
