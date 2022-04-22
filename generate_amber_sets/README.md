@@ -1,6 +1,6 @@
 # Generating AmbER Sets
 
-AmbER sets are built by first collecting relevant Wikdata tuples (known as AmbER set tuples), then using them to construct task-specific instances.
+AmbER sets are built by first collecting relevant Wikidata tuples (known as AmbER set tuples), then using them to construct task-specific instances.
 Our AmbER set instances are aligned to the [KILT Wikipedia dump](https://github.com/facebookresearch/KILT) which we use as the knowledge source.
 This pipeline requires considerable disk space and memory.
 
